@@ -1,6 +1,6 @@
 package com.code972.elasticsearch.plugins;
 
-import com.code972.elasticsearch.analysis.HebrewAnalyzer;
+import com.code972.elasticsearch.analysis.HebrewQueryAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
@@ -17,13 +17,13 @@ import java.io.IOException;
 import java.util.Map;
 
 public class HebrewQueryAnalyzerProvider extends AbstractIndexAnalyzerProvider<PerFieldAnalyzerWrapper> {
-    private final HebrewAnalyzer.HebrewQueryAnalyzer hebrewAnalyzer;
+    private final HebrewQueryAnalyzer hebrewAnalyzer;
     private final PerFieldAnalyzerWrapper perFieldAnalyzerWrapper;
 
     @Inject
     public HebrewQueryAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
-        hebrewAnalyzer = new HebrewAnalyzer.HebrewQueryAnalyzer();
+        hebrewAnalyzer = new HebrewQueryAnalyzer();
 
         final Map<String, Analyzer> analyzerMap = Maps.newHashMap();
         analyzerMap.put("title", hebrewAnalyzer);

@@ -9,37 +9,44 @@ import com.code972.hebmorph.hspell.LingInfo;
 import com.code972.hebmorph.hspell.Loader;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
-import org.apache.lucene.analysis.CommonGramsFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.core.LowerCaseFilter;
-import org.apache.lucene.analysis.hebrew.HebrewTokenizer;
-import org.apache.lucene.analysis.hebrew.MorphAnalyzer;
-import org.apache.lucene.analysis.hebrew.NiqqudFilter;
-import org.apache.lucene.analysis.hebrew.StreamLemmasFilter;
-import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
-import org.apache.lucene.analysis.synonym.SynonymMap;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.analysis.util.WordlistLoader;
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.util.Version;
 import org.elasticsearch.common.base.Charsets;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Files;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class HebrewAnalyzer extends AnalyzerBase {
+public abstract class HebrewAnalyzer extends Analyzer {
+    protected static final Version matchVersion = Version.LUCENE_45;
 
-    private static final DictRadix<Integer> prefixesTree = LingInfo.buildPrefixTree(false);
+    protected static final DictRadix<Integer> prefixesTree = LingInfo.buildPrefixTree(false);
+    protected static DictRadix<MorphData> dictRadix;
+    protected static DictRadix<MorphData> customWords;
+    protected final StreamLemmatizer lemmatizer;
+    protected final LemmaFilterBase lemmaFilter;
+    protected final char originalTermSuffix = '$';
+
     private final static Integer[] descFlags_noun;
     private final static Integer[] descFlags_person_name;
     private final static Integer[] descFlags_place_name;
     private final static Integer[] descFlags_empty;
-    private static SynonymMap acronymMergingMap;
-    private static DictRadix<MorphData> dictRadix;
-    private static DictRadix<MorphData> customWords;
-    protected final StreamLemmatizer lemmatizer;
-    protected final LemmaFilterBase lemmaFilter;
+    private static final Byte dummyData = new Byte((byte)0);
+    protected final static DictRadix<Byte> SPECIAL_TOKENIZATION_CASES;
+
+
+    /** An unmodifiable set containing some common Hebrew words that are usually not
+     useful for searching.
+     */
+    protected final CharArraySet commonWords = null; // TODO
+
 
     static {
         descFlags_noun = new Integer[] { 69 };
@@ -48,8 +55,22 @@ public abstract class HebrewAnalyzer extends AnalyzerBase {
         descFlags_empty = new Integer[] { 0 };
 
         try {
-            dictRadix = Loader.loadDictionaryFromHSpellData(new File(resourcesPath + "hspell-data-files"), true);
-            acronymMergingMap = MorphAnalyzer.buildAcronymsMergingMap();
+            final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
+                    new File(/*resourcesPath +*/ "special_tokenization_cases.txt"), IOUtils.CHARSET_UTF_8),
+                    matchVersion);
+
+            final DictRadix<Byte> radix = new DictRadix<>(false);
+            final Iterator<Object> it = wordsList.iterator();
+            while (it.hasNext()) {
+                radix.addNode((char[]) it.next(), dummyData);
+            }
+            SPECIAL_TOKENIZATION_CASES = radix;
+        } catch (IOException ex) {
+            throw new RuntimeException("Unable to load special tokenization cases list", ex);
+        }
+
+        try {
+            dictRadix = Loader.loadDictionaryFromHSpellData(new File(/* resourcesPath +*/ "hspell-data-files"), true);
         } catch (IOException e) {
             // TODO log
         }
@@ -62,7 +83,7 @@ public abstract class HebrewAnalyzer extends AnalyzerBase {
     }
 
     private static DictRadix<MorphData> loadCustomWords(final DictRadix<MorphData> dictRadix) throws IOException {
-        final List<String> lines = Files.readAllLines(new File(resourcesPath, "hebrew_custom.txt").toPath(), Charsets.UTF_8);
+        final List<String> lines = Files.readAllLines(new File(/* resourcesPath, */ "hebrew_custom.txt").toPath(), Charsets.UTF_8);
 
         final Hashtable<String, String> secondPass = new Hashtable<>();
         final DictRadix<MorphData> custom = new DictRadix<>();
@@ -132,93 +153,10 @@ public abstract class HebrewAnalyzer extends AnalyzerBase {
         return custom;
     }
 
-    protected HebrewAnalyzer(final AnalyzerType analyzerType) throws IOException {
-        super(version, analyzerType, "hebrew_stop.txt");
+    protected HebrewAnalyzer() throws IOException {
         lemmatizer = new StreamLemmatizer(null, dictRadix, prefixesTree, SPECIAL_TOKENIZATION_CASES);
         lemmatizer.setCustomWords(customWords);
         lemmaFilter = new BasicLemmaFilter();
-    }
-
-    @Override
-    protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
-        // on query - if marked as keyword don't keep origin, else only lemmatized (don't suffix)
-        // if word termintates with $ will output word$, else will output all lemmas or word$ if OOV
-        if (analyzerType == AnalyzerType.QUERY) {
-            final StreamLemmasFilter src = new StreamLemmasFilter(reader, dictRadix, prefixesTree, SPECIAL_TOKENIZATION_CASES, commonWords, lemmaFilter);
-            src.setSuffixForExactMatch(originalTermSuffix);
-            src.setKeepOriginalWord(true);
-
-            TokenStream tok = new ASCIIFoldingFilter(src);
-            tok = new AlwaysAddSuffixFilter(tok, '$', true) {
-                @Override
-                protected boolean possiblySkipFilter() {
-                    if (HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew).equals(typeAtt.type())) {
-                        if (keywordAtt.isKeyword())
-                            termAtt.append(suffix);
-                        return true;
-                    }
-
-                    if (CommonGramsFilter.GRAM_TYPE.equals(typeAtt.type()) ||
-                            HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric).equals(typeAtt.type()) ||
-                            HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Mixed).equals(typeAtt.type()))
-                    {
-                        keywordAtt.setKeyword(true);
-                        return true;
-                    }
-                    return false;
-                }
-            };
-            return new TokenStreamComponents(src, tok);
-        }
-
-        if (analyzerType == AnalyzerType.EXACT) { // OK
-            // on exact - we don't care about suffixes at all, we always output original word with suffix only
-            final HebrewTokenizer src = new HebrewTokenizer(reader, prefixesTree, SPECIAL_TOKENIZATION_CASES);
-            TokenStream tok = new NiqqudFilter(src);
-            tok = new LowerCaseFilter(matchVersion, tok);
-            tok = new AlwaysAddSuffixFilter(tok, '$', false) {
-                @Override
-                protected boolean possiblySkipFilter() {
-                    if (CommonGramsFilter.GRAM_TYPE.equals(typeAtt.type()) ||
-                            HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric).equals(typeAtt.type()) ||
-                            HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Mixed).equals(typeAtt.type()))
-                    {
-                        keywordAtt.setKeyword(true);
-                        return true;
-                    }
-                    return false;
-                }
-            };
-            return new TokenStreamComponents(src, tok);
-        }
-
-        // on indexing we should always keep both the stem and marked original word
-        // will ignore $ && will always output all lemmas + origin word$
-        // basically, if analyzerType == AnalyzerType.INDEXING)
-        final StreamLemmasFilter src = new StreamLemmasFilter(reader, dictRadix, prefixesTree, SPECIAL_TOKENIZATION_CASES, commonWords, lemmaFilter);
-        src.setKeepOriginalWord(true);
-
-        TokenStream tok = new ASCIIFoldingFilter(src);
-        tok = new AlwaysAddSuffixFilter(tok, '$', true) {
-            @Override
-            protected boolean possiblySkipFilter() {
-                if (HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew).equals(typeAtt.type())) {
-                    if (keywordAtt.isKeyword())
-                        termAtt.append(suffix);
-                    return true;
-                }
-
-                if (CommonGramsFilter.GRAM_TYPE.equals(typeAtt.type()) ||
-                        HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric).equals(typeAtt.type()) ||
-                        HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Mixed).equals(typeAtt.type()))
-                {
-                    keywordAtt.setKeyword(true);
-                    return true;
-                }
-                return false;
-            }
-        };
-        return new TokenStreamComponents(src, tok);
     }
 
     public static boolean isHebrewWord(final CharSequence word) {
@@ -357,68 +295,5 @@ public abstract class HebrewAnalyzer extends AnalyzerBase {
         }
 
         return WordType.UNRECOGNIZED;
-    }
-
-    public static class HebrewIndexingAnalyzer extends HebrewAnalyzer {
-        public HebrewIndexingAnalyzer() throws IOException {
-            super(AnalyzerType.INDEXING);
-        }
-    }
-
-    public static class HebrewQueryAnalyzer extends HebrewAnalyzer {
-        public HebrewQueryAnalyzer() throws IOException {
-            super(AnalyzerType.QUERY);
-        }
-    }
-
-    public static class HebrewQueryLightAnalyzer extends HebrewAnalyzer {
-        public HebrewQueryLightAnalyzer() throws IOException {
-            super(AnalyzerType.QUERY);
-        }
-
-        @Override
-        protected TokenStreamComponents createComponents(final String fieldName, final Reader reader) {
-            // on query - if marked as keyword don't keep origin, else only lemmatized (don't suffix)
-            // if word termintates with $ will output word$, else will output all lemmas or word$ if OOV
-            final StreamLemmasFilter src = new StreamLemmasFilter(reader, dictRadix, prefixesTree, SPECIAL_TOKENIZATION_CASES, commonWords, lemmaFilter);
-            src.setKeepOriginalWord(false);
-            src.setSuffixForExactMatch(originalTermSuffix);
-
-            TokenStream tok = new ASCIIFoldingFilter(src);
-            //tok = new SuffixKeywordFilter(tok, '$');
-            tok = new AlwaysAddSuffixFilter(tok, '$', true) {
-                @Override
-                protected boolean possiblySkipFilter() {
-                    if (HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew).equals(typeAtt.type())) {
-                        if (keywordAtt.isKeyword())
-                            termAtt.append(suffix);
-                        return true;
-                    }
-
-                    if (HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.NonHebrew).equals(typeAtt.type())) {
-                        if (keywordAtt.isKeyword()) {
-                            termAtt.append(suffix);
-                            return true;
-                        }
-                    }
-
-                    if (CommonGramsFilter.GRAM_TYPE.equals(typeAtt.type()) ||
-                            HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric).equals(typeAtt.type()) ||
-                            HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Mixed).equals(typeAtt.type()))
-                    {
-                        keywordAtt.setKeyword(true);
-                        return true;
-                    }
-                    return false;
-                }
-            };
-            return new TokenStreamComponents(src, tok);
-        }
-    }
-
-    public static class HebrewExactAnalyzer extends HebrewAnalyzer {
-        public HebrewExactAnalyzer() throws IOException {
-            super(AnalyzerType.EXACT);
-        }
     }
 }

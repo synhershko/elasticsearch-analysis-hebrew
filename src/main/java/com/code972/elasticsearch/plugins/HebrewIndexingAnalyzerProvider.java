@@ -1,6 +1,6 @@
 package com.code972.elasticsearch.plugins;
 
-import com.code972.elasticsearch.analysis.HebrewAnalyzer;
+import com.code972.elasticsearch.analysis.HebrewIndexingAnalyzer;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.inject.assistedinject.Assisted;
 import org.elasticsearch.common.settings.Settings;
@@ -11,17 +11,17 @@ import org.elasticsearch.index.settings.IndexSettings;
 
 import java.io.IOException;
 
-public class HebrewIndexingAnalyzerProvider extends AbstractIndexAnalyzerProvider<HebrewAnalyzer.HebrewIndexingAnalyzer> {
-    private final HebrewAnalyzer.HebrewIndexingAnalyzer analyzer;
+public class HebrewIndexingAnalyzerProvider extends AbstractIndexAnalyzerProvider<HebrewIndexingAnalyzer> {
+    private final HebrewIndexingAnalyzer analyzer;
 
     @Inject
     public HebrewIndexingAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
-        analyzer = new HebrewAnalyzer.HebrewIndexingAnalyzer();
+        analyzer = new HebrewIndexingAnalyzer();
     }
 
     @Override
-    public HebrewAnalyzer.HebrewIndexingAnalyzer get() {
+    public HebrewIndexingAnalyzer get() {
         return analyzer;
     }
 }
