@@ -19,7 +19,7 @@ public class AnalysisPlugin extends AbstractPlugin {
 
     @Override
     public String description() {
-        return "Hebrew analyzer based on HebMorph";
+        return "Hebrew analyzer powered by HebMorph";
     }
 
     @Override

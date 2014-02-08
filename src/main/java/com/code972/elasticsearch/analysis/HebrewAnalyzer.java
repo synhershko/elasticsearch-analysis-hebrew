@@ -14,18 +14,14 @@ import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.WordlistLoader;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.Version;
-import org.elasticsearch.common.base.Charsets;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Hashtable;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public abstract class HebrewAnalyzer extends Analyzer {
-    protected static final Version matchVersion = Version.LUCENE_45;
+    protected static final Version matchVersion = Version.LUCENE_46;
 
     protected static final DictRadix<Integer> prefixesTree = LingInfo.buildPrefixTree(false);
     protected static DictRadix<MorphData> dictRadix;
@@ -38,119 +34,44 @@ public abstract class HebrewAnalyzer extends Analyzer {
     private final static Integer[] descFlags_person_name;
     private final static Integer[] descFlags_place_name;
     private final static Integer[] descFlags_empty;
-    private static final Byte dummyData = new Byte((byte)0);
-    protected final static DictRadix<Byte> SPECIAL_TOKENIZATION_CASES;
-
-
-    /** An unmodifiable set containing some common Hebrew words that are usually not
-     useful for searching.
-     */
-    protected final CharArraySet commonWords = null; // TODO
-
+    private static final Byte dummyData = (byte) 0;
+    protected static DictRadix<Byte> SPECIAL_TOKENIZATION_CASES;
 
     static {
+
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        try {
+            Loader loader = new Loader(classloader, "hspell-data-files/", true);
+            dictRadix = loader.loadDictionaryFromHSpellData();
+        } catch (IOException e) {
+        }
+
         descFlags_noun = new Integer[] { 69 };
         descFlags_person_name = new Integer[] { 262145 };
         descFlags_place_name = new Integer[] { 262153 };
         descFlags_empty = new Integer[] { 0 };
 
         try {
-            final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
-                    new File(/*resourcesPath +*/ "special_tokenization_cases.txt"), IOUtils.CHARSET_UTF_8),
-                    matchVersion);
+            InputStream is = classloader.getResourceAsStream("special-tokenization-cases.txt");
+            if (is != null) {
+                final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
+                        is, IOUtils.CHARSET_UTF_8), matchVersion);
 
-            final DictRadix<Byte> radix = new DictRadix<>(false);
-            final Iterator<Object> it = wordsList.iterator();
-            while (it.hasNext()) {
-                radix.addNode((char[]) it.next(), dummyData);
+                final DictRadix<Byte> radix = new DictRadix<>(false);
+                final Iterator<Object> it = wordsList.iterator();
+                while (it.hasNext()) {
+                    radix.addNode((char[]) it.next(), dummyData);
+                }
+                SPECIAL_TOKENIZATION_CASES = radix;
             }
-            SPECIAL_TOKENIZATION_CASES = radix;
-        } catch (IOException ex) {
-            throw new RuntimeException("Unable to load special tokenization cases list", ex);
+        } catch (IOException e) {
         }
 
         try {
-            dictRadix = Loader.loadDictionaryFromHSpellData(new File(/* resourcesPath +*/ "hspell-data-files"), true);
+            customWords = Loader.loadCustomWords(classloader.getResourceAsStream("custom-words.txt"), dictRadix);
         } catch (IOException e) {
-            // TODO log
+
         }
-
-        try {
-            customWords = loadCustomWords(dictRadix);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static DictRadix<MorphData> loadCustomWords(final DictRadix<MorphData> dictRadix) throws IOException {
-        final List<String> lines = Files.readAllLines(new File(/* resourcesPath, */ "hebrew_custom.txt").toPath(), Charsets.UTF_8);
-
-        final Hashtable<String, String> secondPass = new Hashtable<>();
-        final DictRadix<MorphData> custom = new DictRadix<>();
-        for (final String line : lines) {
-            String[] cells = line.split(" ");
-            if (cells.length < 2)
-                continue;
-
-            MorphData md = null;
-            if ("שםעצם".equals(cells[1])) {
-                md = new MorphData();
-                md.setPrefixes((short) 63);
-                md.setLemmas(new String[] { cells[0] });
-                md.setDescFlags(descFlags_noun);
-            } else if ("שםחברה".equals(cells[1]) || "שםפרטי".equals(cells[1])) {
-                md = new MorphData();
-                md.setPrefixes((short) 8);
-                md.setLemmas(new String[] { cells[0] });
-                md.setDescFlags(descFlags_person_name);
-            } else if ("שםמקום".equals(cells[1])) {
-                md = new MorphData();
-                md.setPrefixes((short) 8);
-                md.setLemmas(new String[] { cells[0] });
-                md.setDescFlags(descFlags_place_name);
-            } else if ("שםמדויק".equals(cells[1])) {
-                md = new MorphData();
-                md.setPrefixes((short) 0);
-                md.setLemmas(new String[] { cells[0] });
-                md.setDescFlags(descFlags_empty);
-            }
-
-            if (md == null) { // allow to associate new entries with other custom entries
-                try {
-                    md = custom.lookup(cells[1], false);
-                } catch (IllegalArgumentException ignored_ex) {
-                }
-            }
-
-            if (md == null) {
-                try {
-                    md = dictRadix.lookup(cells[1], false);
-                } catch (IllegalArgumentException ignored_ex) {
-                }
-            }
-
-            if (md != null) {
-                custom.addNode(cells[0], md);
-            } else {
-                secondPass.put(cells[0], cells[1]);
-            }
-        }
-
-        for (final Map.Entry<String, String> entry : secondPass.entrySet()) {
-            try {
-                custom.lookup(entry.getKey(), false);
-                continue; // we already stored this word somehow
-            } catch (IllegalArgumentException expected_ex) {
-            }
-
-            try {
-                final MorphData md = custom.lookup(entry.getValue(), false);
-                if (md != null) custom.addNode(entry.getKey(), md);
-            } catch (IllegalArgumentException ignored_ex) {
-            }
-        }
-
-        return custom;
     }
 
     protected HebrewAnalyzer() throws IOException {
