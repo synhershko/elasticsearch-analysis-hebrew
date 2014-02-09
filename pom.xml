@@ -8,13 +8,40 @@
   <packaging>jar</packaging>
 
   <name>elasticsearch-analysis-hebrew</name>
-  <url>http://maven.apache.org</url>
+  <url>http://code972.com/</url>
 
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <lucene.version>4.6.1</lucene.version>
       <elasticsearch.version>0.90.11</elasticsearch.version>
   </properties>
+  
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+  
+  <licenses>
+      <license>
+          <name>Affero GPL3</name>
+          <url>http://www.gnu.org/licenses/agpl.html</url>
+          <distribution>repo</distribution>
+          <comments>The GNU Affero General Public License is a free, copyleft license for software and other kinds of works, specifically designed to ensure cooperation with the community in the case of network server software.</comments>
+      </license>
+  </licenses>
+    <developers>
+        <developer>
+            <id>synhershko</id>
+            <name>Itamar Syn-Hershko</name>
+            <url>http://code972.com</url>
+        </developer>
+    </developers>
+    <scm>
+        <url>https://github.com/synhershko/elasticsearch-analysis-hebrew/</url>
+	<connection>scm:git:ssh://git@github.com/synhershko/elasticsearch-analysis-hebrew.git</connection>
+	<developerConnection>scm:git:ssh://git@github.com/synhershko/elasticsearch-analysis-hebrew.git</developerConnection>
+    </scm>
 
     <build>
         <resources>
