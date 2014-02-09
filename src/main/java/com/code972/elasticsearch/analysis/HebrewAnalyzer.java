@@ -37,6 +37,8 @@ public abstract class HebrewAnalyzer extends Analyzer {
     private static final Byte dummyData = (byte) 0;
     protected static DictRadix<Byte> SPECIAL_TOKENIZATION_CASES;
 
+    protected CharArraySet commonWords = null;
+
     static {
 
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
