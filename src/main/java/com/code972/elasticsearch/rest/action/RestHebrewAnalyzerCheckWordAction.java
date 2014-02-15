@@ -19,7 +19,7 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     @Inject
     public RestHebrewAnalyzerCheckWordAction(Settings settings, Client client, RestController controller) {
         super(settings, client);
-        controller.registerHandler(GET, "/_hebrew/{word}", this);
+        controller.registerHandler(GET, "/_hebrew/check-word/{word}", this);
     }
 
     @Override
