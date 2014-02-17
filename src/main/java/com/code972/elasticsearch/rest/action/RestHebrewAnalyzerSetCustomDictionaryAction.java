@@ -35,7 +35,17 @@ public class RestHebrewAnalyzerSetCustomDictionaryAction extends BaseRestHandler
     @Override
     public void handleRequest(final RestRequest request, final RestChannel channel) {
         try {
-            HebrewAnalyzer.setCustomWords(new ByteArrayInputStream(request.param("customWords").getBytes("UTF-8")));
+            if (!request.hasContent()) {
+                XContentBuilder builder = restContentBuilder(request);
+                builder.startObject();
+                builder.field("status", "Error: please provide a list of words to populate the dictionary with");
+                builder.endObject();
+
+                channel.sendResponse(new XContentRestResponse(request, RestStatus.BAD_REQUEST, builder));
+                return;
+            }
+
+            HebrewAnalyzer.setCustomWords(request.content().streamInput());
 
             XContentBuilder builder = restContentBuilder(request);
             builder.startObject();
