@@ -3,7 +3,7 @@
 
   <groupId>com.code972</groupId>
   <artifactId>elasticsearch-analysis-hebrew</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <packaging>jar</packaging>
 
   <name>elasticsearch-analysis-hebrew</name>
