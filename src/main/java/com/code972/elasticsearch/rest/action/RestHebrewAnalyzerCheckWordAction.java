@@ -1,6 +1,11 @@
 package com.code972.elasticsearch.rest.action;
 
 import com.code972.elasticsearch.analysis.HebrewAnalyzer;
+import com.code972.elasticsearch.analysis.HebrewQueryAnalyzer;
+import com.code972.elasticsearch.analysis.HebrewQueryLightAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
@@ -34,6 +39,17 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
             builder.field("word", word);
             builder.field("isRecognized", wordType != HebrewAnalyzer.WordType.UNRECOGNIZED);
             builder.field("wordType", wordType);
+            if (wordType != HebrewAnalyzer.WordType.UNRECOGNIZED) {
+                builder.startArray("lemmas");
+                Analyzer a = new HebrewQueryLightAnalyzer();
+                TokenStream ts = a.tokenStream("foo", word);
+                while (ts.incrementToken()) {
+                    CharTermAttribute cta = ts.getAttribute(CharTermAttribute.class);
+                    builder.value(new String(cta.buffer(), 0, cta.length()));
+                }
+                a.close();
+                builder.endArray();
+            }
             builder.endObject();
 
             channel.sendResponse(new XContentRestResponse(request, RestStatus.OK, builder));
