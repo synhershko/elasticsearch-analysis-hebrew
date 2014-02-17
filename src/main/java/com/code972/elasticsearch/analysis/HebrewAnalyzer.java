@@ -107,31 +107,33 @@ public abstract class HebrewAnalyzer extends Analyzer {
         Integer prefixMask;
         MorphData md;
 
-        try {
-            if (customWords.lookup(word) != null) return WordType.CUSTOM;
-        } catch (IllegalArgumentException e) {
-        }
-
-        while (true) {
-            // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
-            if (word.length() - prefLen < 2)
-                break;
-
+        if (customWords != null) {
             try {
-                prefixMask = prefixesTree.lookup(word.substring(0, ++prefLen));
+                if (customWords.lookup(word) != null) return WordType.CUSTOM;
             } catch (IllegalArgumentException e) {
-                break;
             }
 
-            try {
-                md = customWords.lookup(word.substring(prefLen));
-            } catch (IllegalArgumentException e) {
-                md = null;
-            }
-            if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
-                for (int result = 0; result < md.getLemmas().length; result++) {
-                    if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
-                        return WordType.CUSTOM_WITH_PREFIX;
+            while (true) {
+                // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
+                if (word.length() - prefLen < 2)
+                    break;
+
+                try {
+                    prefixMask = prefixesTree.lookup(word.substring(0, ++prefLen));
+                } catch (IllegalArgumentException e) {
+                    break;
+                }
+
+                try {
+                    md = customWords.lookup(word.substring(prefLen));
+                } catch (IllegalArgumentException e) {
+                    md = null;
+                }
+                if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
+                    for (int result = 0; result < md.getLemmas().length; result++) {
+                        if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
+                            return WordType.CUSTOM_WITH_PREFIX;
+                        }
                     }
                 }
             }
