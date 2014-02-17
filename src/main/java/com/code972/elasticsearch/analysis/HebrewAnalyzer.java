@@ -26,7 +26,6 @@ public abstract class HebrewAnalyzer extends Analyzer {
     protected static final DictRadix<Integer> prefixesTree = LingInfo.buildPrefixTree(false);
     protected static DictRadix<MorphData> dictRadix;
     protected static DictRadix<MorphData> customWords;
-    protected final StreamLemmatizer lemmatizer;
     protected final LemmaFilterBase lemmaFilter;
     protected final char originalTermSuffix = '$';
 
@@ -77,8 +76,6 @@ public abstract class HebrewAnalyzer extends Analyzer {
     }
 
     protected HebrewAnalyzer() throws IOException {
-        lemmatizer = new StreamLemmatizer(null, dictRadix, prefixesTree, SPECIAL_TOKENIZATION_CASES);
-        lemmatizer.setCustomWords(customWords);
         lemmaFilter = new BasicLemmaFilter();
     }
 
