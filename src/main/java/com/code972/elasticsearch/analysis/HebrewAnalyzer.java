@@ -69,10 +69,14 @@ public abstract class HebrewAnalyzer extends Analyzer {
         }
 
         try {
-            customWords = Loader.loadCustomWords(classloader.getResourceAsStream("custom-words.txt"), dictRadix);
+            setCustomWords(classloader.getResourceAsStream("custom-words.txt"));
         } catch (IOException e) {
 
         }
+    }
+
+    public static void setCustomWords(InputStream input) throws IOException {
+        customWords = Loader.loadCustomWords(input, dictRadix);
     }
 
     protected HebrewAnalyzer() throws IOException {
