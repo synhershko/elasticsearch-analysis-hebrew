@@ -5,6 +5,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.hebrew.HebrewTokenizer;
 import org.apache.lucene.analysis.hebrew.NiqqudFilter;
+import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -21,6 +22,7 @@ public class HebrewExactAnalyzer extends HebrewAnalyzer {
         // on exact - we don't care about suffixes at all, we always output original word with suffix only
         final HebrewTokenizer src = new HebrewTokenizer(reader, prefixesTree, SPECIAL_TOKENIZATION_CASES);
         TokenStream tok = new NiqqudFilter(src);
+        tok = new ASCIIFoldingFilter(tok);
         tok = new LowerCaseFilter(matchVersion, tok);
         tok = new AlwaysAddSuffixFilter(tok, '$', false) {
             @Override
