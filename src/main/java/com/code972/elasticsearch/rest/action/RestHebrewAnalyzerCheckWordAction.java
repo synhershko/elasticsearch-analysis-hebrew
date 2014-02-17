@@ -37,7 +37,6 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
             XContentBuilder builder = restContentBuilder(request);
             builder.startObject();
             builder.field("word", word);
-            builder.field("isRecognized", wordType != HebrewAnalyzer.WordType.UNRECOGNIZED);
             builder.field("wordType", wordType);
             if (wordType != HebrewAnalyzer.WordType.UNRECOGNIZED && wordType != HebrewAnalyzer.WordType.NON_HEBREW) {
                 builder.startArray("lemmas");
