@@ -1,6 +1,10 @@
 Hebrew analyzer for Elasticsearch, powered by HebMorph
 
-Install: ~/elasticsearch-0.90.11$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.0.zip
+## Installation
+
+~/elasticsearch-0.90.11$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.0.zip
+
+~/elasticsearch-1.0.0$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.1.zip
 
 
 Use "hebrew" as analyzer name for fields containing Hebrew text
