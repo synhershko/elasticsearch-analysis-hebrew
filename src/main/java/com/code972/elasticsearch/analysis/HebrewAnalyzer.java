@@ -136,6 +136,9 @@ public abstract class HebrewAnalyzer extends Analyzer {
             }
         }
 
+        if (!isHebrewWord(word))
+            return WordType.NON_HEBREW;
+
         try {
             if (dictRadix.lookup(word) != null) return WordType.HEBREW;
         } catch (IllegalArgumentException e) {
