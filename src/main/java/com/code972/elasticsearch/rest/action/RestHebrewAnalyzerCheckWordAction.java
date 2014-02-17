@@ -31,7 +31,7 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     public void handleRequest(final RestRequest request, final RestChannel channel) {
         try {
             final String word = request.param("word");
-            final boolean tolerate = request.paramAsBooleanOptional("tolerate", true);
+            final boolean tolerate = request.paramAsBoolean("tolerate", true);
             HebrewAnalyzer.WordType wordType = HebrewAnalyzer.isRecognizedWord(word, tolerate);
 
             XContentBuilder builder = restContentBuilder(request);
