@@ -22,6 +22,7 @@ public class HebrewQueryLightAnalyzer extends HebrewAnalyzer {
         // on query - if marked as keyword don't keep origin, else only lemmatized (don't suffix)
         // if word termintates with $ will output word$, else will output all lemmas or word$ if OOV
         final StreamLemmasFilter src = new StreamLemmasFilter(reader, dictRadix, prefixesTree, SPECIAL_TOKENIZATION_CASES, commonWords, lemmaFilter);
+        src.setCustomWords(customWords);
         src.setKeepOriginalWord(false);
         src.setSuffixForExactMatch(originalTermSuffix);
 

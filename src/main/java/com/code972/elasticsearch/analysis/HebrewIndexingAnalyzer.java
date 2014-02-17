@@ -22,6 +22,7 @@ public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
         // will ignore $ && will always output all lemmas + origin word$
         // basically, if analyzerType == AnalyzerType.INDEXING)
         final StreamLemmasFilter src = new StreamLemmasFilter(reader, dictRadix, prefixesTree, SPECIAL_TOKENIZATION_CASES, commonWords, lemmaFilter);
+        src.setCustomWords(customWords);
         src.setKeepOriginalWord(true);
 
         TokenStream tok = new ASCIIFoldingFilter(src);
