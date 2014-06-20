@@ -2,6 +2,8 @@
 
 Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under the AGPL3
 
+![](https://travis-ci.org/synhershko/elasticsearch-analysis-hebrew.svg?branch=master)
+
 ## Installation
 
 ~/elasticsearch-0.90.11$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.0.zip
