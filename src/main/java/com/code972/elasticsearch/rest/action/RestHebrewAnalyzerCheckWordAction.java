@@ -18,7 +18,7 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
 import static org.elasticsearch.rest.action.support.RestXContentBuilder.restContentBuilder;
 
 /**
- * Created by user on 14/02/14.
+ * Created by synhershko on 14/02/14.
  */
 public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     @Inject
