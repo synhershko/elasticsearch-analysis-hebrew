@@ -24,17 +24,18 @@ public class HebrewExactAnalyzer extends HebrewAnalyzer {
         TokenStream tok = new NiqqudFilter(src);
         tok = new ASCIIFoldingFilter(tok);
         tok = new LowerCaseFilter(matchVersion, tok);
-        tok = new AlwaysAddSuffixFilter(tok, '$', false) {
+        tok = new AddSuffixFilter(tok, '$') {
             @Override
-            protected boolean possiblySkipFilter() {
+            protected void handleCurrentToken() {
                 if (CommonGramsFilter.GRAM_TYPE.equals(typeAtt.type()) ||
                         HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Numeric).equals(typeAtt.type()) ||
                         HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Mixed).equals(typeAtt.type()))
                 {
                     keywordAtt.setKeyword(true);
-                    return true;
+                    return;
                 }
-                return false;
+
+                suffixCurrent();
             }
         };
         return new TokenStreamComponents(src, tok);

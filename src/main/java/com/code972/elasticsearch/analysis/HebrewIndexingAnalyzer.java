@@ -26,13 +26,13 @@ public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
         src.setKeepOriginalWord(true);
 
         TokenStream tok = new ASCIIFoldingFilter(src);
-        tok = new AlwaysAddSuffixFilter(tok, '$', true) {
+        tok = new AddSuffixFilter(tok, '$') {
             @Override
-            protected boolean possiblySkipFilter() {
+            protected void handleCurrentToken() {
                 if (HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Hebrew).equals(typeAtt.type())) {
                     if (keywordAtt.isKeyword())
-                        termAtt.append(suffix);
-                    return true;
+                        suffixCurrent();
+                    return;
                 }
 
                 if (CommonGramsFilter.GRAM_TYPE.equals(typeAtt.type()) ||
@@ -40,9 +40,11 @@ public class HebrewIndexingAnalyzer extends HebrewAnalyzer {
                         HebrewTokenizer.tokenTypeSignature(HebrewTokenizer.TOKEN_TYPES.Mixed).equals(typeAtt.type()))
                 {
                     keywordAtt.setKeyword(true);
-                    return true;
+                    return;
                 }
-                return false;
+
+                duplicateCurrentToken();
+                suffixCurrent();
             }
         };
         return new TokenStreamComponents(src, tok);
