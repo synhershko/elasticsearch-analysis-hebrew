@@ -2,10 +2,7 @@ package com.code972.elasticsearch.analysis;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.analysis.tokenattributes.*;
 
 import java.io.IOException;
 
@@ -14,9 +11,11 @@ public class AlwaysAddSuffixFilter extends TokenFilter {
     protected final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     protected final PositionIncrementAttribute posIncAtt = addAttribute(PositionIncrementAttribute.class);
     protected final KeywordAttribute keywordAtt = addAttribute(KeywordAttribute.class);
+    protected final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
 
     protected final Character suffix;
     private final boolean keepOrigin;
+    private int latestStartOffset, latestEndOffset;
 
     public AlwaysAddSuffixFilter(final TokenStream input, final Character suffixToAdd) {
         this(input, suffixToAdd, false);
@@ -34,12 +33,15 @@ public class AlwaysAddSuffixFilter extends TokenFilter {
     @Override
     public final boolean incrementToken() throws IOException {
         if (tokenLen > 0) {
+            clearAttributes();
+
             termAtt.resizeBuffer(tokenLen);
             System.arraycopy(tokenBuffer, 0, termAtt.buffer(), 0, tokenLen);
             termAtt.setLength(tokenLen);
             tokenLen = 0;
+
             posIncAtt.setPositionIncrement(0); // since we are just putting the original now
-            keywordAtt.setKeyword(false);
+            offsetAtt.setOffset(latestStartOffset, latestEndOffset);
             return true;
         }
 
@@ -71,6 +73,8 @@ public class AlwaysAddSuffixFilter extends TokenFilter {
             tokenBuffer = termAtt.buffer().clone();
         else
             System.arraycopy(termAtt.buffer(), 0, tokenBuffer, 0, tokenLen);
+        latestEndOffset = offsetAtt.endOffset();
+        latestStartOffset = offsetAtt.startOffset();
     }
 
     protected boolean possiblySkipFilter() {
