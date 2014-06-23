@@ -42,10 +42,12 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
                 builder.startArray("lemmas");
                 Analyzer a = new HebrewQueryLightAnalyzer();
                 TokenStream ts = a.tokenStream("foo", word);
+                ts.reset();
                 while (ts.incrementToken()) {
                     CharTermAttribute cta = ts.getAttribute(CharTermAttribute.class);
                     builder.value(new String(cta.buffer(), 0, cta.length()));
                 }
+                ts.close();
                 a.close();
                 builder.endArray();
             }
