@@ -16,25 +16,17 @@ import org.elasticsearch.index.settings.IndexSettings;
 import java.io.IOException;
 import java.util.Map;
 
-public class HebrewQueryAnalyzerProvider extends AbstractIndexAnalyzerProvider<PerFieldAnalyzerWrapper> {
+public class HebrewQueryAnalyzerProvider extends AbstractIndexAnalyzerProvider<HebrewQueryAnalyzer> {
     private final HebrewQueryAnalyzer hebrewAnalyzer;
-    private final PerFieldAnalyzerWrapper perFieldAnalyzerWrapper;
 
     @Inject
     public HebrewQueryAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
         hebrewAnalyzer = new HebrewQueryAnalyzer();
-
-        final Map<String, Analyzer> analyzerMap = Maps.newHashMap();
-        analyzerMap.put("title", hebrewAnalyzer);
-        analyzerMap.put("topic", hebrewAnalyzer);
-        analyzerMap.put("parent_title", hebrewAnalyzer);
-        analyzerMap.put("replies.text", hebrewAnalyzer);
-        perFieldAnalyzerWrapper = new PerFieldAnalyzerWrapper(new KeywordAnalyzer(), analyzerMap);
     }
 
     @Override
-    public PerFieldAnalyzerWrapper get() {
-        return perFieldAnalyzerWrapper;
+    public HebrewQueryAnalyzer get() {
+        return hebrewAnalyzer;
     }
 }

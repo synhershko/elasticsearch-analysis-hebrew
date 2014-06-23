@@ -1,5 +1,6 @@
 package com.code972.elasticsearch.plugins;
 
+import com.code972.elasticsearch.analysis.HebrewQueryAnalyzer;
 import com.code972.elasticsearch.analysis.HebrewQueryLightAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
@@ -16,25 +17,17 @@ import org.elasticsearch.index.settings.IndexSettings;
 import java.io.IOException;
 import java.util.Map;
 
-public class HebrewQueryLightAnalyzerProvider extends AbstractIndexAnalyzerProvider<PerFieldAnalyzerWrapper> {
+public class HebrewQueryLightAnalyzerProvider extends AbstractIndexAnalyzerProvider<HebrewQueryLightAnalyzer> {
     private final HebrewQueryLightAnalyzer hebrewAnalyzer;
-    private final PerFieldAnalyzerWrapper perFieldAnalyzerWrapper;
 
     @Inject
     public HebrewQueryLightAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
         hebrewAnalyzer = new HebrewQueryLightAnalyzer();
-
-        final Map<String, Analyzer> analyzerMap = Maps.newHashMap();
-        analyzerMap.put("title", hebrewAnalyzer);
-        analyzerMap.put("topic", hebrewAnalyzer);
-        analyzerMap.put("parent_title", hebrewAnalyzer);
-        analyzerMap.put("replies.text", hebrewAnalyzer);
-        perFieldAnalyzerWrapper = new PerFieldAnalyzerWrapper(new KeywordAnalyzer(), analyzerMap);
     }
 
     @Override
-    public PerFieldAnalyzerWrapper get() {
-        return perFieldAnalyzerWrapper;
+    public HebrewQueryLightAnalyzer get() {
+        return hebrewAnalyzer;
     }
 }
