@@ -12,6 +12,8 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.rest.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.elasticsearch.rest.RestRequest.Method.GET;
 
@@ -37,20 +39,28 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
         builder.field("wordType", wordType);
         if (wordType != HebrewAnalyzer.WordType.UNRECOGNIZED && wordType != HebrewAnalyzer.WordType.NON_HEBREW) {
             builder.startArray("lemmas");
-            Analyzer a = new HebrewQueryLightAnalyzer();
-            TokenStream ts = a.tokenStream("foo", word);
-            ts.reset();
-            while (ts.incrementToken()) {
-                CharTermAttribute cta = ts.getAttribute(CharTermAttribute.class);
-                builder.value(new String(cta.buffer(), 0, cta.length()));
+            for (String lemma : getLemmas(word)) {
+                builder.value(lemma);
             }
-            ts.close();
-            a.close();
             builder.endArray();
         }
         builder.endObject();
 
         channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
+    }
+
+    public static List<String> getLemmas(String word) throws IOException {
+        List<String> ret = new ArrayList<>();
+        Analyzer a = new HebrewQueryLightAnalyzer();
+        TokenStream ts = a.tokenStream("foo", word);
+        ts.reset();
+        while (ts.incrementToken()) {
+            CharTermAttribute cta = ts.getAttribute(CharTermAttribute.class);
+            ret.add(new String(cta.buffer(), 0, cta.length()));
+        }
+        ts.close();
+        a.close();
+        return ret;
     }
 }
 
