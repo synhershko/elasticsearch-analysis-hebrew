@@ -1,7 +1,6 @@
 package com.code972.elasticsearch.rest.action;
 
 import com.code972.elasticsearch.analysis.HebrewAnalyzer;
-import com.code972.elasticsearch.analysis.HebrewQueryAnalyzer;
 import com.code972.elasticsearch.analysis.HebrewQueryLightAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -15,7 +14,6 @@ import org.elasticsearch.rest.*;
 import java.io.IOException;
 
 import static org.elasticsearch.rest.RestRequest.Method.GET;
-import static org.elasticsearch.rest.action.support.RestXContentBuilder.restContentBuilder;
 
 /**
  * Created by synhershko on 14/02/14.
@@ -28,39 +26,31 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     }
 
     @Override
-    public void handleRequest(final RestRequest request, final RestChannel channel) {
-        try {
-            final String word = request.param("word");
-            final boolean tolerate = request.paramAsBoolean("tolerate", true);
-            HebrewAnalyzer.WordType wordType = HebrewAnalyzer.isRecognizedWord(word, tolerate);
+    public void handleRequest(final RestRequest request, final RestChannel channel) throws IOException {
+        final String word = request.param("word");
+        final boolean tolerate = request.paramAsBoolean("tolerate", true);
+        HebrewAnalyzer.WordType wordType = HebrewAnalyzer.isRecognizedWord(word, tolerate);
 
-            XContentBuilder builder = restContentBuilder(request);
-            builder.startObject();
-            builder.field("word", word);
-            builder.field("wordType", wordType);
-            if (wordType != HebrewAnalyzer.WordType.UNRECOGNIZED && wordType != HebrewAnalyzer.WordType.NON_HEBREW) {
-                builder.startArray("lemmas");
-                Analyzer a = new HebrewQueryLightAnalyzer();
-                TokenStream ts = a.tokenStream("foo", word);
-                ts.reset();
-                while (ts.incrementToken()) {
-                    CharTermAttribute cta = ts.getAttribute(CharTermAttribute.class);
-                    builder.value(new String(cta.buffer(), 0, cta.length()));
-                }
-                ts.close();
-                a.close();
-                builder.endArray();
+        XContentBuilder builder = channel.newBuilder().startObject();
+        builder.startObject();
+        builder.field("word", word);
+        builder.field("wordType", wordType);
+        if (wordType != HebrewAnalyzer.WordType.UNRECOGNIZED && wordType != HebrewAnalyzer.WordType.NON_HEBREW) {
+            builder.startArray("lemmas");
+            Analyzer a = new HebrewQueryLightAnalyzer();
+            TokenStream ts = a.tokenStream("foo", word);
+            ts.reset();
+            while (ts.incrementToken()) {
+                CharTermAttribute cta = ts.getAttribute(CharTermAttribute.class);
+                builder.value(new String(cta.buffer(), 0, cta.length()));
             }
-            builder.endObject();
-
-            channel.sendResponse(new XContentRestResponse(request, RestStatus.OK, builder));
-        } catch (Exception e) {
-            try {
-                channel.sendResponse(new XContentThrowableRestResponse(request, e));
-            } catch (IOException e1) {
-                logger.error("Failed to send failure response", e1);
-            }
+            ts.close();
+            a.close();
+            builder.endArray();
         }
+        builder.endObject();
+
+        channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
     }
 }
 

@@ -1,29 +1,22 @@
 package com.code972.elasticsearch.rest.action;
 
 import com.code972.elasticsearch.analysis.HebrewAnalyzer;
-import com.code972.elasticsearch.analysis.HebrewQueryLightAnalyzer;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.elasticsearch.ElasticsearchIllegalArgumentException;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.rest.*;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 
-import static org.elasticsearch.rest.RestRequest.Method.GET;
 import static org.elasticsearch.rest.RestRequest.Method.POST;
-import static org.elasticsearch.rest.action.support.RestXContentBuilder.restContentBuilder;
 
 /**
  * NOTE: This is a pure hack - it won't work for a multi-node cluster, and won't survive restarts
  * Added it for the sake of making demos more awesome
  * Use at your own risk
+ * See https://github.com/elasticsearch/elasticsearch/issues/5124
  */
 public class RestHebrewAnalyzerSetCustomDictionaryAction extends BaseRestHandler {
     @Inject
@@ -33,33 +26,19 @@ public class RestHebrewAnalyzerSetCustomDictionaryAction extends BaseRestHandler
     }
 
     @Override
-    public void handleRequest(final RestRequest request, final RestChannel channel) {
-        try {
-            if (!request.hasContent()) {
-                XContentBuilder builder = restContentBuilder(request);
-                builder.startObject();
-                builder.field("status", "Error: please provide a list of words to populate the dictionary with");
-                builder.endObject();
-
-                channel.sendResponse(new XContentRestResponse(request, RestStatus.BAD_REQUEST, builder));
-                return;
-            }
-
-            HebrewAnalyzer.setCustomWords(request.content().streamInput());
-
-            XContentBuilder builder = restContentBuilder(request);
-            builder.startObject();
-            builder.field("status", "ok");
-            builder.endObject();
-
-            channel.sendResponse(new XContentRestResponse(request, RestStatus.OK, builder));
-        } catch (Exception e) {
-            try {
-                channel.sendResponse(new XContentThrowableRestResponse(request, e));
-            } catch (IOException e1) {
-                logger.error("Failed to send failure response", e1);
-            }
+    public void handleRequest(final RestRequest request, final RestChannel channel) throws IOException {
+        if (!request.hasContent()) {
+            throw new ElasticsearchIllegalArgumentException("Error: please provide a list of words to populate the dictionary with");
         }
+
+        HebrewAnalyzer.setCustomWords(request.content().streamInput());
+
+        XContentBuilder builder = channel.newBuilder().startObject();
+        builder.startObject();
+        builder.field("status", "ok");
+        builder.endObject();
+
+        channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
     }
 }
 

@@ -17,11 +17,12 @@ import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 
 public abstract class HebrewAnalyzer extends Analyzer {
-    protected static final Version matchVersion = Version.LUCENE_46;
+    protected static final Version matchVersion = Version.LUCENE_48;
 
     protected static final DictRadix<Integer> prefixesTree = LingInfo.buildPrefixTree(false);
     protected static DictRadix<MorphData> dictRadix;
@@ -56,7 +57,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
             InputStream is = classloader.getResourceAsStream("special-tokenization-cases.txt");
             if (is != null) {
                 final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
-                        is, IOUtils.CHARSET_UTF_8), matchVersion);
+                        is, StandardCharsets.UTF_8), matchVersion);
 
                 final DictRadix<Byte> radix = new DictRadix<>(false);
                 final Iterator<Object> it = wordsList.iterator();
