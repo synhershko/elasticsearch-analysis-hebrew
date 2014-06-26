@@ -19,6 +19,9 @@ public class TestHebrewQueryAnalyzer extends BaseTokenStreamTestCase {
         assertAnalyzesTo(a, "ץץץץץץץץץץץ", new String[]{}); // Invalid, treated as noise
         assertAnalyzesTo(a, "ץץץץץץץץץץץ$", new String[]{}); // Invalid, treated as noise
 
+        assertAnalyzesTo(a, "אנציקלופדיה", new String[]{"אנציקלופדיה$", "אנציקלופדיה"});
+        assertAnalyzesTo(a, "אנצקלופדיה", new String[]{"אנצקלופדיה$", "אנציקלופדיה"});
+
         assertAnalyzesTo(a, "שמלות", new String[]{"שמלות$", "שמלה", "מל"});
 
         // Test non-Hebrew
