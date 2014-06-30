@@ -40,11 +40,10 @@ public abstract class HebrewAnalyzer extends Analyzer {
     protected CharArraySet commonWords = null;
 
     static {
-
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try {
             Loader loader = new Loader(classloader, "hspell-data-files/", true);
-            dictRadix = loader.loadDictionaryFromHSpellData();
+            setDictRadix(loader.loadDictionaryFromHSpellData());
         } catch (IOException e) {
         }
 
@@ -54,18 +53,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
         descFlags_empty = new Integer[] { 0 };
 
         try {
-            InputStream is = classloader.getResourceAsStream("special-tokenization-cases.txt");
-            if (is != null) {
-                final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
-                        is, StandardCharsets.UTF_8), matchVersion);
-
-                final DictRadix<Byte> radix = new DictRadix<>(false);
-                final Iterator<Object> it = wordsList.iterator();
-                while (it.hasNext()) {
-                    radix.addNode((char[]) it.next(), dummyData);
-                }
-                SPECIAL_TOKENIZATION_CASES = radix;
-            }
+            setCustomTokenizationCases(classloader.getResourceAsStream("special-tokenization-cases.txt"));
         } catch (IOException e) {
         }
 
@@ -74,6 +62,23 @@ public abstract class HebrewAnalyzer extends Analyzer {
         } catch (IOException e) {
 
         }
+    }
+
+    public static void setCustomTokenizationCases(InputStream input) throws IOException {
+        if (input != null) {
+            final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
+                    input, StandardCharsets.UTF_8), matchVersion);
+
+            final DictRadix<Byte> radix = new DictRadix<>(false);
+            for (Object aWordsList : wordsList) {
+                radix.addNode((char[]) aWordsList, dummyData);
+            }
+            SPECIAL_TOKENIZATION_CASES = radix;
+        }
+    }
+
+    public static void setDictRadix(final DictRadix<MorphData> radix) {
+        dictRadix = radix;
     }
 
     public static void setCustomWords(InputStream input) throws IOException {
