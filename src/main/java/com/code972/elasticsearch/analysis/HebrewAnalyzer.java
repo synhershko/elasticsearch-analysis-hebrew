@@ -62,7 +62,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
         }
     }
 
-    public static void setCustomTokenizationCases(InputStream input) throws IOException {
+    public static DictRadix<Byte> setCustomTokenizationCases(InputStream input) throws IOException {
         if (input != null) {
             final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
                     input, StandardCharsets.UTF_8), matchVersion);
@@ -73,14 +73,16 @@ public abstract class HebrewAnalyzer extends Analyzer {
             }
             SPECIAL_TOKENIZATION_CASES = radix;
         }
+        return SPECIAL_TOKENIZATION_CASES;
     }
 
     public static void setDictRadix(final DictRadix<MorphData> radix) {
         dictRadix = radix;
     }
 
-    public static void setCustomWords(InputStream input) throws IOException {
+    public static DictRadix<MorphData> setCustomWords(InputStream input) throws IOException {
         customWords = Loader.loadCustomWords(input, dictRadix);
+        return customWords;
     }
 
     protected HebrewAnalyzer() throws IOException {
