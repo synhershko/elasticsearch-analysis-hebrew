@@ -32,21 +32,12 @@ public abstract class HebrewAnalyzer extends Analyzer {
     protected final LemmaFilterBase lemmaFilter;
     protected final char originalTermSuffix = '$';
 
-    private final static Integer[] descFlags_noun;
-    private final static Integer[] descFlags_person_name;
-    private final static Integer[] descFlags_place_name;
-    private final static Integer[] descFlags_empty;
     private static final Byte dummyData = (byte) 0;
     protected static DictRadix<Byte> SPECIAL_TOKENIZATION_CASES;
 
     protected CharArraySet commonWords = null;
 
     static {
-        descFlags_noun = new Integer[] { 69 };
-        descFlags_person_name = new Integer[] { 262145 };
-        descFlags_place_name = new Integer[] { 262153 };
-        descFlags_empty = new Integer[] { 0 };
-
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try {
             Loader loader = new Loader(classloader, "hspell-data-files/", true);
