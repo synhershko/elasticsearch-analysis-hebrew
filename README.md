@@ -10,7 +10,7 @@ Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under 
 
 ~/elasticsearch-1.0.0$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.2.zip
 
-~/elasticsearch-1.2.1$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.3.zip
+~/elasticsearch-1.2.1$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.4.zip
 
 ## Usage
 
