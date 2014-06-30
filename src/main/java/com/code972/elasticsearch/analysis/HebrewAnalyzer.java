@@ -14,6 +14,8 @@ import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.WordlistLoader;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.Version;
+import org.elasticsearch.common.logging.ESLogger;
+import org.elasticsearch.common.logging.Loggers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,27 +42,32 @@ public abstract class HebrewAnalyzer extends Analyzer {
     protected CharArraySet commonWords = null;
 
     static {
-        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        try {
-            Loader loader = new Loader(classloader, "hspell-data-files/", true);
-            setDictRadix(loader.loadDictionaryFromHSpellData());
-        } catch (IOException e) {
-        }
-
         descFlags_noun = new Integer[] { 69 };
         descFlags_person_name = new Integer[] { 262145 };
         descFlags_place_name = new Integer[] { 262153 };
         descFlags_empty = new Integer[] { 0 };
 
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        try {
+            Loader loader = new Loader(classloader, "hspell-data-files/", true);
+            setDictRadix(loader.loadDictionaryFromHSpellData());
+        } catch (IOException e) {
+            final ESLogger logger = Loggers.getLogger(HebrewAnalyzer.class);
+            logger.error("Unable to load the hspell dictionary files", e);
+        }
+
         try {
             setCustomTokenizationCases(classloader.getResourceAsStream("special-tokenization-cases.txt"));
         } catch (IOException e) {
+            final ESLogger logger = Loggers.getLogger(HebrewAnalyzer.class);
+            logger.debug("Unable to load special tokenization cases", e);
         }
 
         try {
             setCustomWords(classloader.getResourceAsStream("custom-words.txt"));
         } catch (IOException e) {
-
+            final ESLogger logger = Loggers.getLogger(HebrewAnalyzer.class);
+            logger.debug("Unable to load custom dictionary", e);
         }
     }
 
@@ -116,7 +123,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
         if (customWords != null) {
             try {
                 if (customWords.lookup(word) != null) return WordType.CUSTOM;
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ignored_ex) {
             }
 
             while (true) {
@@ -126,13 +133,13 @@ public abstract class HebrewAnalyzer extends Analyzer {
 
                 try {
                     prefixMask = prefixesTree.lookup(word.substring(0, ++prefLen));
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException ignored_ex) {
                     break;
                 }
 
                 try {
                     md = customWords.lookup(word.substring(prefLen));
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException ignored_ex) {
                     md = null;
                 }
                 if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
@@ -150,13 +157,13 @@ public abstract class HebrewAnalyzer extends Analyzer {
 
         try {
             if (dictRadix.lookup(word) != null) return WordType.HEBREW;
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored_ex) {
         }
 
         if (word.endsWith("'")) { // Try ommitting closing Geresh
             try {
                 if (dictRadix.lookup(word.substring(0, word.length() - 1)) != null) return WordType.HEBREW;
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ignored_ex) {
             }
         }
 
