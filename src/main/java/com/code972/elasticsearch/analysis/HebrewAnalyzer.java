@@ -26,7 +26,7 @@ import java.util.List;
 public abstract class HebrewAnalyzer extends Analyzer {
     protected static final Version matchVersion = Version.LUCENE_48;
 
-    protected static final DictRadix<Integer> prefixesTree = LingInfo.buildPrefixTree(false);
+    public static final DictRadix<Integer> prefixesTree = LingInfo.buildPrefixTree(false);
     protected static DictRadix<MorphData> dictRadix;
     protected static DictRadix<MorphData> customWords;
     protected final LemmaFilterBase lemmaFilter;
