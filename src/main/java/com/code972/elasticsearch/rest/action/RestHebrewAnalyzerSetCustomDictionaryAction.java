@@ -34,7 +34,6 @@ public class RestHebrewAnalyzerSetCustomDictionaryAction extends BaseRestHandler
         HebrewAnalyzer.setCustomWords(request.content().streamInput());
 
         XContentBuilder builder = channel.newBuilder().startObject();
-        builder.startObject();
         builder.field("status", "ok");
         builder.endObject();
 
