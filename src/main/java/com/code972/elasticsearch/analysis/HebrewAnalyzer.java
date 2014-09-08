@@ -20,13 +20,14 @@ import org.elasticsearch.common.logging.Loggers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 public abstract class HebrewAnalyzer extends Analyzer {
-    protected static final Version matchVersion = Version.LUCENE_48;
+    protected static final Version matchVersion = Version.LUCENE_4_9;
 
-    public static final DictRadix<Integer> prefixesTree = LingInfo.buildPrefixTree(false);
+    public static final HashMap<String, Integer> prefixesTree = LingInfo.buildPrefixTree(false);
     protected static DictRadix<MorphData> dictRadix;
     protected static DictRadix<MorphData> customWords;
     protected final LemmaFilterBase lemmaFilter;
@@ -124,11 +125,8 @@ public abstract class HebrewAnalyzer extends Analyzer {
                 if (word.length() - prefLen < 2)
                     break;
 
-                try {
-                    prefixMask = prefixesTree.lookup(word.substring(0, ++prefLen));
-                } catch (IllegalArgumentException ignored_ex) {
+                if ((prefixMask = prefixesTree.get(word.substring(0, ++prefLen))) == null)
                     break;
-                }
 
                 try {
                     md = customWords.lookup(word.substring(prefLen));
@@ -166,11 +164,8 @@ public abstract class HebrewAnalyzer extends Analyzer {
             if (word.length() - prefLen < 2)
                 break;
 
-            try {
-                prefixMask = prefixesTree.lookup(word.substring(0, ++prefLen));
-            } catch (IllegalArgumentException e) {
+            if ((prefixMask = prefixesTree.get(word.substring(0, ++prefLen))) == null)
                 break;
-            }
 
             try {
                 md = dictRadix.lookup(word.substring(prefLen));
@@ -206,11 +201,8 @@ public abstract class HebrewAnalyzer extends Analyzer {
                 if (word.length() - prefLen < 2)
                     break;
 
-                try {
-                    prefixMask = prefixesTree.lookup(word.substring(0, ++prefLen));
-                } catch (IllegalArgumentException e) {
+                if ((prefixMask = prefixesTree.get(word.substring(0, ++prefLen))) == null)
                     break;
-                }
 
                 tolerated = dictRadix.lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
                 if (tolerated != null)

@@ -26,7 +26,7 @@ public class RestHebrewAnalyzerSetCustomDictionaryAction extends BaseRestHandler
     }
 
     @Override
-    public void handleRequest(final RestRequest request, final RestChannel channel) throws IOException {
+    protected void handleRequest(RestRequest request, RestChannel channel, Client client) throws Exception {
         if (!request.hasContent()) {
             throw new ElasticsearchIllegalArgumentException("Error: please provide a list of words to populate the dictionary with");
         }

@@ -28,7 +28,7 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     }
 
     @Override
-    public void handleRequest(final RestRequest request, final RestChannel channel) throws IOException {
+    protected void handleRequest(RestRequest request, RestChannel channel, Client client) throws Exception {
         final String word = request.param("word");
         final boolean tolerate = request.paramAsBoolean("tolerate", true);
         HebrewAnalyzer.WordType wordType = HebrewAnalyzer.isRecognizedWord(word, tolerate);
