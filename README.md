@@ -12,6 +12,8 @@ Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under 
 
 ~/elasticsearch-1.2.1$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.4.zip
 
+~/elasticsearch-1.3.2$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.5.zip
+
 ## Usage
 
 Use "hebrew" as analyzer name for fields containing Hebrew text
