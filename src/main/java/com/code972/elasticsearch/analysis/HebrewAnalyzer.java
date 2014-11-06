@@ -2,11 +2,11 @@ package com.code972.elasticsearch.analysis;
 
 import com.code972.hebmorph.LookupTolerators;
 import com.code972.hebmorph.MorphData;
-import com.code972.hebmorph.StreamLemmatizer;
 import com.code972.hebmorph.Tokenizer;
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
+import com.code972.hebmorph.hspell.HSpellLoader;
 import com.code972.hebmorph.hspell.LingInfo;
-import com.code972.hebmorph.hspell.Loader;
 import com.code972.hebmorph.lemmafilters.BasicLemmaFilter;
 import com.code972.hebmorph.lemmafilters.LemmaFilterBase;
 import org.apache.lucene.analysis.Analyzer;
@@ -14,31 +14,29 @@ import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.analysis.util.WordlistLoader;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.Version;
-import org.elasticsearch.common.logging.ESLogger;
-import org.elasticsearch.common.logging.Loggers;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class HebrewAnalyzer extends Analyzer {
     protected static final Version matchVersion = Version.LUCENE_4_9;
+    private static final Byte dummyData = (byte) 0;
 
-    public static final HashMap<String, Integer> prefixesTree = LingInfo.buildPrefixTree(false);
-    protected static DictRadix<MorphData> dictRadix;
-    protected static DictRadix<MorphData> customWords;
+    //    protected final HashMap<String, Integer> prefixesTree = LingInfo.buildPrefixTree(false);
+//    protected final DictRadix<MorphData> dictRadix;
+    protected DictHebMorph dict;
+    protected DictRadix<MorphData> customWords;
     protected final LemmaFilterBase lemmaFilter;
     protected final char originalTermSuffix = '$';
+    protected DictRadix<Byte> SPECIAL_TOKENIZATION_CASES = null;
 
-    private static final Byte dummyData = (byte) 0;
-    protected static DictRadix<Byte> SPECIAL_TOKENIZATION_CASES;
 
     protected CharArraySet commonWords = null;
 
-    static {
+/*    static {
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try {
             Loader loader = new Loader(classloader, "hspell-data-files/", true);
@@ -61,9 +59,9 @@ public abstract class HebrewAnalyzer extends Analyzer {
             final ESLogger logger = Loggers.getLogger(HebrewAnalyzer.class);
             logger.debug("Unable to load custom dictionary", e);
         }
-    }
+    }*/
 
-    public static DictRadix<Byte> setCustomTokenizationCases(InputStream input) throws IOException {
+    public DictRadix<Byte> setCustomTokenizationCases(InputStream input) throws IOException {
         if (input != null) {
             final CharArraySet wordsList = WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(
                     input, StandardCharsets.UTF_8), matchVersion);
@@ -77,23 +75,25 @@ public abstract class HebrewAnalyzer extends Analyzer {
         return SPECIAL_TOKENIZATION_CASES;
     }
 
-    public static void setDictRadix(final DictRadix<MorphData> radix) {
-        dictRadix = radix;
-    }
+//    public void setDict(final DictHebMorph dict) {
+//        this.dict = dict;
+//    }
 
-    public static DictRadix<MorphData> setCustomWords(InputStream input) throws IOException {
-        customWords = Loader.loadCustomWords(input, dictRadix);
+    public DictRadix<MorphData> setCustomWords(InputStream input) throws IOException {
+        customWords = HSpellLoader.loadCustomWords(input, dict.getRadix());
         return customWords;
     }
 
-    protected HebrewAnalyzer() throws IOException {
+    protected HebrewAnalyzer(DictHebMorph dict, DictRadix<MorphData> customWords) throws IOException {
         lemmaFilter = new BasicLemmaFilter();
+        this.dict = dict;
+        this.customWords = customWords;
     }
 
     public static boolean isHebrewWord(final CharSequence word) {
         for (int i = 0; i < word.length(); i++) {
-             if (Tokenizer.isHebrewLetter(word.charAt(i)))
-                 return true;
+            if (Tokenizer.isHebrewLetter(word.charAt(i)))
+                return true;
         }
         return false;
     }
@@ -109,10 +109,12 @@ public abstract class HebrewAnalyzer extends Analyzer {
         CUSTOM_WITH_PREFIX,
     }
 
-    public static WordType isRecognizedWord(final String word, final boolean tolerate) {
+    public WordType isRecognizedWord(final String word, final boolean tolerate) {
         byte prefLen = 0;
         Integer prefixMask;
         MorphData md;
+        HashMap<String, Integer> prefixesTree = dict.getPref();
+        DictRadix<MorphData> dictRadix = dict.getRadix();
 
         if (customWords != null) {
             try {
@@ -135,7 +137,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
                 }
                 if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
                     for (int result = 0; result < md.getLemmas().length; result++) {
-                        if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
+                        if ((LingInfo.DMask2ps(md.getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
                             return WordType.CUSTOM_WITH_PREFIX;
                         }
                     }
@@ -174,7 +176,7 @@ public abstract class HebrewAnalyzer extends Analyzer {
             }
             if ((md != null) && ((md.getPrefixes() & prefixMask) > 0)) {
                 for (int result = 0; result < md.getLemmas().length; result++) {
-                    if ((LingInfo.DMask2ps(md.getDescFlags()[result]) & prefixMask) > 0) {
+                    if ((LingInfo.DMask2ps(md.getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
                         return WordType.HEBREW_WITH_PREFIX;
                     }
                 }
@@ -189,14 +191,12 @@ public abstract class HebrewAnalyzer extends Analyzer {
             }
 
             List<DictRadix<MorphData>.LookupResult> tolerated = dictRadix.lookupTolerant(word, LookupTolerators.TolerateEmKryiaAll);
-            if (tolerated != null && tolerated.size() > 0)
-            {
+            if (tolerated != null && tolerated.size() > 0) {
                 return WordType.HEBREW_TOLERATED;
             }
 
             prefLen = 0;
-            while (true)
-            {
+            while (true) {
                 // Make sure there are at least 2 letters left after the prefix (the words של, שלא for example)
                 if (word.length() - prefLen < 2)
                     break;
@@ -205,14 +205,10 @@ public abstract class HebrewAnalyzer extends Analyzer {
                     break;
 
                 tolerated = dictRadix.lookupTolerant(word.substring(prefLen), LookupTolerators.TolerateEmKryiaAll);
-                if (tolerated != null)
-                {
-                    for (DictRadix<MorphData>.LookupResult lr : tolerated)
-                    {
-                        for (int result = 0; result < lr.getData().getLemmas().length; result++)
-                        {
-                            if ((LingInfo.DMask2ps(lr.getData().getDescFlags()[result]) & prefixMask) > 0)
-                            {
+                if (tolerated != null) {
+                    for (DictRadix<MorphData>.LookupResult lr : tolerated) {
+                        for (int result = 0; result < lr.getData().getLemmas().length; result++) {
+                            if ((LingInfo.DMask2ps(lr.getData().getLemmas()[result].getDescFlag()) & prefixMask) > 0) {
                                 return WordType.HEBREW_TOLERATED_WITH_PREFIX;
                             }
                         }

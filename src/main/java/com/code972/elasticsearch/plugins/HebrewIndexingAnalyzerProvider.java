@@ -17,7 +17,7 @@ public class HebrewIndexingAnalyzerProvider extends AbstractIndexAnalyzerProvide
     @Inject
     public HebrewIndexingAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
-        analyzer = new HebrewIndexingAnalyzer();
+        analyzer = HebrewIndexingAnalyzer.getHebrewIndexingAnalyzer();
     }
 
     @Override

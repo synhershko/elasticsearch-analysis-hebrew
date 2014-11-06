@@ -17,7 +17,7 @@ public class HebrewQueryLightAnalyzerProvider extends AbstractIndexAnalyzerProvi
     @Inject
     public HebrewQueryLightAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
-        hebrewAnalyzer = new HebrewQueryLightAnalyzer();
+        hebrewAnalyzer = HebrewQueryLightAnalyzer.getHebrewQueryLightAnalyzer();
     }
 
     @Override

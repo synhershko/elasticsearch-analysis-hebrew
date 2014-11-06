@@ -120,13 +120,14 @@
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
-
-        <dependency>
+       <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-core</artifactId>
             <version>1.5.0</version>
-            <scope>compile</scope>
-        </dependency>
+           <!-- <scope>compile</scope> -->
+           <scope>system</scope>
+            <systemPath>${project.basedir}/hebmorph-java.jar</systemPath> <!--remove this -->
+       </dependency>
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-lucene</artifactId>

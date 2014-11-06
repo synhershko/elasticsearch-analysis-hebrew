@@ -27,9 +27,9 @@ public class TestSearchAndIndexingCompatibility {
     }
 
     private static void indexAndSearch(String indexingTerm, String searchTerm) throws IOException {
-        Analyzer indexingAnalyzer = new HebrewIndexingAnalyzer();
+        Analyzer indexingAnalyzer = HebrewIndexingAnalyzer.getHebrewIndexingAnalyzer();
         //Analyzer searchAnalyzer = new HebrewIndexingAnalyzer();
-        Analyzer searchAnalyzer = new HebrewQueryAnalyzer();
+        Analyzer searchAnalyzer = HebrewQueryAnalyzer.getHebrewQueryAnalyzer();
 
         HashSet<String> indexedTerms = new HashSet<>();
         TokenStream ts = indexingAnalyzer.tokenStream("foo", indexingTerm);

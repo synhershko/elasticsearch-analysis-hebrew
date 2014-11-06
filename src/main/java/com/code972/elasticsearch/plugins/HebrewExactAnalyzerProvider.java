@@ -17,7 +17,7 @@ public class HebrewExactAnalyzerProvider extends AbstractIndexAnalyzerProvider<H
     @Inject
     public HebrewExactAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
-        analyzer = new HebrewExactAnalyzer();
+        analyzer = HebrewExactAnalyzer.getHebrewExactAnalyzer();
     }
 
     @Override

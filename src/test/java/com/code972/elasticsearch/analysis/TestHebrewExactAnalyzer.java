@@ -10,11 +10,11 @@ import java.io.IOException;
  */
 public class TestHebrewExactAnalyzer extends BaseTokenStreamTestCase {
     public void testRandomStrings() throws Exception {
-        checkRandomData(random(), new HebrewExactAnalyzer(), 1000*RANDOM_MULTIPLIER);
+        checkRandomData(random(), HebrewExactAnalyzer.getHebrewExactAnalyzer(), 1000*RANDOM_MULTIPLIER);
     }
 
     public void testBasics() throws IOException {
-        HebrewExactAnalyzer a = new HebrewExactAnalyzer();
+        HebrewExactAnalyzer a = HebrewExactAnalyzer.getHebrewExactAnalyzer();
 
         checkOneTerm(a, "בדיקה", "בדיקה$");
         checkOneTerm(a, "בדיקה$", "בדיקה$");

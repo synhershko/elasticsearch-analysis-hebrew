@@ -10,7 +10,7 @@ import java.io.IOException;
  */
 public class TestHebrewQueryAnalyzer extends BaseTokenStreamTestCase {
     public void testBasics() throws IOException {
-        Analyzer a = new HebrewQueryAnalyzer();
+        Analyzer a = HebrewQueryAnalyzer.getHebrewQueryAnalyzer();
 
         assertAnalyzesTo(a, "אימא", new String[]{"אימא$", "אימא"}); // recognized word, lemmatized
         assertAnalyzesTo(a, "אימא$", new String[]{"אימא$"}); // recognized word, lemmatized

@@ -10,13 +10,14 @@ import java.io.IOException;
  */
 public class TestHebrewIndexingAnalyzer extends BaseTokenStreamTestCase {
     public void testDictionaryLoaded() throws IOException {
-        assertEquals(HebrewAnalyzer.WordType.HEBREW, HebrewAnalyzer.isRecognizedWord("אימא", false));
-        assertEquals(HebrewAnalyzer.WordType.HEBREW, HebrewAnalyzer.isRecognizedWord("בדיקה", false));
-        assertEquals(HebrewAnalyzer.WordType.UNRECOGNIZED, HebrewAnalyzer.isRecognizedWord("ץץץץץץ", false));
+        HebrewAnalyzer a = HebrewIndexingAnalyzer.getHebrewIndexingAnalyzer();
+        assertEquals(HebrewAnalyzer.WordType.HEBREW, a.isRecognizedWord("אימא", false));
+        assertEquals(HebrewAnalyzer.WordType.HEBREW, a.isRecognizedWord("בדיקה", false));
+        assertEquals(HebrewAnalyzer.WordType.UNRECOGNIZED, a.isRecognizedWord("ץץץץץץ", false));
     }
 
     public void testBasics() throws IOException {
-        Analyzer a = new HebrewIndexingAnalyzer();
+        Analyzer a = HebrewIndexingAnalyzer.getHebrewIndexingAnalyzer();
 
         assertAnalyzesTo(a, "אימא", new String[]{"אימא$", "אימא"}); // recognized word, lemmatized
         assertAnalyzesTo(a, "אימא$", new String[]{"אימא$", "אימא"}); // recognized word, lemmatized
