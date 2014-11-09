@@ -1,6 +1,7 @@
 package com.code972.elasticsearch.plugins;
 
-import com.code972.elasticsearch.analysis.HebrewQueryLightAnalyzer;
+import com.code972.hebmorph.hspell.HSpellLoader;
+import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.inject.assistedinject.Assisted;
 import org.elasticsearch.common.settings.Settings;
@@ -17,7 +18,7 @@ public class HebrewQueryLightAnalyzerProvider extends AbstractIndexAnalyzerProvi
     @Inject
     public HebrewQueryLightAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
-        hebrewAnalyzer = HebrewQueryLightAnalyzer.getHebrewQueryLightAnalyzer();
+        hebrewAnalyzer = HSpellLoader.getHebrewQueryLightAnalyzer();
     }
 
     @Override

@@ -28,7 +28,7 @@ public class AnalysisPlugin extends AbstractPlugin {
     @Override
     public void processModule(Module module) {
         if (module instanceof AnalysisModule) {
-            ((AnalysisModule)module).addProcessor(new HebrewAnalysisBinderProcessor());
+            ((AnalysisModule) module).addProcessor(new HebrewAnalysisBinderProcessor());
         } else if (module instanceof RestModule) {
             ((RestModule) module).addRestAction(RestHebrewAnalyzerCheckWordAction.class);
             ((RestModule) module).addRestAction(RestHebrewAnalyzerSetCustomDictionaryAction.class);

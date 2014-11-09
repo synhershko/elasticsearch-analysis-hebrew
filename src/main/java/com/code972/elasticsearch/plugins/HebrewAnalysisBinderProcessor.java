@@ -9,6 +9,7 @@ import java.util.Map;
 public class HebrewAnalysisBinderProcessor extends AnalysisModule.AnalysisBinderProcessor {
 
     private final static HashMap<String, Class<? extends AnalyzerProvider>> languageAnalyzers = new HashMap<>();
+
     static {
         languageAnalyzers.put("hebrew", HebrewIndexingAnalyzerProvider.class);
         languageAnalyzers.put("hebrew_query", HebrewQueryAnalyzerProvider.class);

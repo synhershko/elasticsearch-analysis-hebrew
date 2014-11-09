@@ -1,7 +1,8 @@
 package com.code972.elasticsearch.rest.action;
 
-import com.code972.elasticsearch.analysis.HebrewAnalyzer;
-import com.code972.elasticsearch.analysis.HebrewQueryLightAnalyzer;
+import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
+import org.apache.lucene.analysis.hebrew.HebrewAnalyzer;
+
 import com.code972.hebmorph.MorphData;
 import com.code972.hebmorph.datastructures.DictHebMorph;
 import com.code972.hebmorph.datastructures.DictRadix;
