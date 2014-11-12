@@ -1,34 +1,38 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.code972</groupId>
-  <artifactId>elasticsearch-analysis-hebrew</artifactId>
-  <version>1.6-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <groupId>com.code972</groupId>
+    <artifactId>elasticsearch-analysis-hebrew</artifactId>
+    <version>1.6-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-  <name>elasticsearch-analysis-hebrew</name>
-  <url>http://code972.com/</url>
+    <name>elasticsearch-analysis-hebrew</name>
+    <url>http://code972.com/</url>
 
-  <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <lucene.version>4.9.0</lucene.version>
-      <elasticsearch.version>1.3.2</elasticsearch.version>
-  </properties>
-  
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
-  
-  <licenses>
-      <license>
-          <name>Affero GPL3</name>
-          <url>http://www.gnu.org/licenses/agpl.html</url>
-          <distribution>repo</distribution>
-          <comments>The GNU Affero General Public License is a free, copyleft license for software and other kinds of works, specifically designed to ensure cooperation with the community in the case of network server software.</comments>
-      </license>
-  </licenses>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lucene.version>4.9.0</lucene.version>
+        <elasticsearch.version>1.3.2</elasticsearch.version>
+    </properties>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <licenses>
+        <license>
+            <name>Affero GPL3</name>
+            <url>http://www.gnu.org/licenses/agpl.html</url>
+            <distribution>repo</distribution>
+            <comments>The GNU Affero General Public License is a free, copyleft license for software and other kinds of
+                works, specifically designed to ensure cooperation with the community in the case of network server
+                software.
+            </comments>
+        </license>
+    </licenses>
     <developers>
         <developer>
             <id>synhershko</id>
@@ -39,7 +43,8 @@
     <scm>
         <url>https://github.com/synhershko/elasticsearch-analysis-hebrew/</url>
         <connection>scm:git:ssh://git@github.com/synhershko/elasticsearch-analysis-hebrew.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/synhershko/elasticsearch-analysis-hebrew.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com/synhershko/elasticsearch-analysis-hebrew.git
+        </developerConnection>
     </scm>
 
     <build>
@@ -107,34 +112,23 @@
             <artifactId>lucene-core</artifactId>
             <version>${lucene.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
             <version>${lucene.version}</version>
             <scope>compile</scope>
         </dependency>
-        
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
-       <dependency>
-            <groupId>com.code972.hebmorph</groupId>
-            <artifactId>hebmorph-core</artifactId>
-            <version>1.5.0</version>
-           <!-- <scope>compile</scope> -->
-           <scope>system</scope>
-            <systemPath>${project.basedir}/hebmorph-java.jar</systemPath> <!--remove this -->
-       </dependency>
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
-            <artifactId>hebmorph-lucene</artifactId>
-            <version>1.5.0</version>
+            <artifactId>hebmorph-core</artifactId>
+            <version>2.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
