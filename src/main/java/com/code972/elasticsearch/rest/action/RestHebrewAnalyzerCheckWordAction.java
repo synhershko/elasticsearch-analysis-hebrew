@@ -1,13 +1,9 @@
 package com.code972.elasticsearch.rest.action;
 
-import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
-import org.apache.lucene.analysis.hebrew.HebrewAnalyzer;
-
-import com.code972.hebmorph.MorphData;
-import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.datastructures.DictRadix;
-import com.code972.hebmorph.hspell.HSpellLoader;
+import com.code972.elasticsearch.plugins.DictReceiver;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.hebrew.HebrewAnalyzer;
+import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.inject.Inject;
@@ -15,10 +11,8 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.rest.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.elasticsearch.rest.RestRequest.Method.GET;
@@ -33,9 +27,7 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     public RestHebrewAnalyzerCheckWordAction(Settings settings, Client client, RestController controller) throws IOException {
         super(settings, client);
         controller.registerHandler(GET, "/_hebrew/check-word/{word}", this);
-        DictRadix<MorphData> radix = new HSpellLoader(new File(HSpellLoader.getHspellPath()), true).loadDictionaryFromHSpellData();
-        HashMap<String, Integer> prefs = HSpellLoader.readPrefixesFromFile(HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH);
-        analyzer = new HebrewQueryLightAnalyzer(new DictHebMorph(radix,prefs),null); //since this used to used as a static, this makes sense
+        analyzer = new HebrewQueryLightAnalyzer(DictReceiver.getDictionary()); //since this used to used as a static, this makes sense
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.code972.elasticsearch.plugins;
 
 import com.code972.elasticsearch.rest.action.RestHebrewAnalyzerCheckWordAction;
-import com.code972.elasticsearch.rest.action.RestHebrewAnalyzerSetCustomDictionaryAction;
 import org.elasticsearch.common.inject.Module;
 import org.elasticsearch.index.analysis.AnalysisModule;
 import org.elasticsearch.plugins.AbstractPlugin;
@@ -31,7 +30,6 @@ public class AnalysisPlugin extends AbstractPlugin {
             ((AnalysisModule) module).addProcessor(new HebrewAnalysisBinderProcessor());
         } else if (module instanceof RestModule) {
             ((RestModule) module).addRestAction(RestHebrewAnalyzerCheckWordAction.class);
-            ((RestModule) module).addRestAction(RestHebrewAnalyzerSetCustomDictionaryAction.class);
         }
     }
 }

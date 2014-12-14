@@ -1,6 +1,5 @@
 package com.code972.elasticsearch.plugins;
 
-import com.code972.hebmorph.hspell.HSpellLoader;
 import org.apache.lucene.analysis.hebrew.HebrewIndexingAnalyzer;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.inject.assistedinject.Assisted;
@@ -18,7 +17,7 @@ public class HebrewIndexingAnalyzerProvider extends AbstractIndexAnalyzerProvide
     @Inject
     public HebrewIndexingAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
-        analyzer = HSpellLoader.getHebrewIndexingAnalyzer();
+        analyzer = new HebrewIndexingAnalyzer(DictReceiver.getDictionary());
     }
 
     @Override
