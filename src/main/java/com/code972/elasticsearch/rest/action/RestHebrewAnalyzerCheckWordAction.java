@@ -1,6 +1,8 @@
 package com.code972.elasticsearch.rest.action;
 
 import com.code972.elasticsearch.plugins.DictReceiver;
+import com.code972.hebmorph.WordType;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.hebrew.HebrewAnalyzer;
 import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
@@ -21,24 +23,21 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
  * Created by synhershko on 14/02/14.
  */
 public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
-    HebrewAnalyzer analyzer;
-
     @Inject
     public RestHebrewAnalyzerCheckWordAction(Settings settings, Client client, RestController controller) throws IOException {
-        super(settings, client);
+        super(settings,controller, client);
         controller.registerHandler(GET, "/_hebrew/check-word/{word}", this);
-        analyzer = new HebrewQueryLightAnalyzer(DictReceiver.getDictionary()); //since this used to used as a static, this makes sense
     }
 
     @Override
     protected void handleRequest(RestRequest request, RestChannel channel, Client client) throws Exception {
         final String word = request.param("word");
         final boolean tolerate = request.paramAsBoolean("tolerate", true);
-        HebrewAnalyzer.WordType wordType = analyzer.isRecognizedWord(word, tolerate);
+        WordType wordType = HebrewAnalyzer.isRecognizedWord(word, tolerate, DictReceiver.getDictionary());
         XContentBuilder builder = channel.newBuilder().startObject();
         builder.field("word", word);
         builder.field("wordType", wordType);
-        if (wordType != HebrewAnalyzer.WordType.UNRECOGNIZED && wordType != HebrewAnalyzer.WordType.NON_HEBREW) {
+        if (wordType != WordType.UNRECOGNIZED && wordType != WordType.NON_HEBREW) {
             builder.startArray("lemmas");
             for (String lemma : getLemmas(word)) {
                 builder.value(lemma);
@@ -46,13 +45,13 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
             builder.endArray();
         }
         builder.endObject();
-
         channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
     }
 
     public List<String> getLemmas(String word) throws IOException {
         List<String> ret = new ArrayList<>();
-        TokenStream ts = analyzer.tokenStream("foo", word);
+        Analyzer a = new HebrewQueryLightAnalyzer(DictReceiver.getDictionary());
+        TokenStream ts = a.tokenStream("foo", word);
         ts.reset();
         while (ts.incrementToken()) {
             CharTermAttribute cta = ts.getAttribute(CharTermAttribute.class);

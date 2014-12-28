@@ -21,7 +21,6 @@ public class DictReceiver {
     }
 
     private static DictHebMorph setDictionary() {
-
         File file;
         for (String path : gZipFilePaths) {
             file = new File(path);
