@@ -12,12 +12,49 @@ import java.io.IOException;
  */
 public class DictReceiver {
     private static String home = System.getProperty("user.home");
-    private static String[] gZipFilePaths = {"plugins/analysis-hebrew/dictH.gz", "/var/lib/hebmorph/dictH.gz", home + "/hebmorph/dictH.gz"};
-    private static String[] hspellFilePaths = {"plugins/analysis-hebrew/hspell-data-files/", "/var/lib/hspell-data-files/", home + "/hspell-data-files/"};
-    private static DictHebMorph dict = setDictionary();
+    private static String elastic_folder = "/elasticsearch-1.4.2/";
+    private static String[] gZipFilePaths = {home + elastic_folder + "plugins/analysis-hebrew/dictH.gz", "/var/lib/hebmorph/dictH.gz", home + "/hebmorph/dictH.gz"};
+    private static String[] hspellFilePaths = {home + elastic_folder + "plugins/analysis-hebrew/hspell-data-files/", "/var/lib/hspell-data-files/", home + "/hspell-data-files/"};
+    private static DictHebMorph dict = null;
 
     public static DictHebMorph getDictionary() {
+        if (dict == null) {
+            dict = setDictionary();
+        }
         return dict;
+    }
+
+    public static boolean setHebmorphDictionary(String dictheb_path) {
+        if (dictheb_path != null) {
+            File file = new File(dictheb_path);
+            if (file.exists()) {
+                try {
+                    System.out.println("Successfully loaded from: " + dictheb_path);
+                    dict = DictionaryLoader.loadDicAndPrefixesFromGzip(dictheb_path);
+                    return true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean setHspellDictionary(String hspell_folder) {
+        if (hspell_folder != null) {
+            File file = new File(hspell_folder);
+            if (file.exists() && file.isDirectory()) {
+                try {
+                    System.out.println("Successfully loaded from: " + hspell_folder);
+                    HSpellLoader loader = new HSpellLoader(file, true);
+                    dict = new DictHebMorph(loader.loadDictionaryFromHSpellData(), HSpellLoader.readDefaultPrefixes());
+                    return true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
     }
 
     private static DictHebMorph setDictionary() {
@@ -32,7 +69,6 @@ public class DictReceiver {
                     e.printStackTrace();
                 }
             }
-            System.out.println("Can't load from: " + file.getAbsolutePath());
         }
         for (String path : hspellFilePaths) {
             file = new File(path);
@@ -45,7 +81,6 @@ public class DictReceiver {
                     e.printStackTrace();
                 }
             }
-            System.out.println("Can't load from: " + file.getAbsolutePath());
         }
         throw new IllegalArgumentException("Could not load any dictionary. Aborting!");
     }

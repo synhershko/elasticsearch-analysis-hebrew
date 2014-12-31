@@ -25,7 +25,7 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
 public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     @Inject
     public RestHebrewAnalyzerCheckWordAction(Settings settings, Client client, RestController controller) throws IOException {
-        super(settings,controller, client);
+        super(settings, controller, client);
         controller.registerHandler(GET, "/_hebrew/check-word/{word}", this);
     }
 
