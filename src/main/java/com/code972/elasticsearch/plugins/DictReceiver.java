@@ -2,10 +2,10 @@ package com.code972.elasticsearch.plugins;
 
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
+import com.code972.hebmorph.hspell.HSpellLoader;
 
 import java.io.File;
 import java.io.IOException;
-
 
 /**
  * Created by Egozy on 03/12/2014.
@@ -85,5 +85,3 @@ public class DictReceiver {
         throw new IllegalArgumentException("Could not load any dictionary. Aborting!");
     }
 }
-
-
