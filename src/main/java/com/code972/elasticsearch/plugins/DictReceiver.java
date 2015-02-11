@@ -12,9 +12,9 @@ import java.io.IOException;
  */
 public class DictReceiver {
     private static String home = System.getProperty("user.home");
-    private static String[] gZipFilePaths = {"plugins/analysis-hebrew/dictH.gz", "/var/lib/hebmorph/dictH.gz", home + "/hebmorph/dictH.gz"};
+    private static String[] gZipFilePaths = {"plugins/analysis-hebrew/dictH.dict", "/var/lib/hebmorph/dictH.dict", home + "/hebmorph/dictH.dict"};
     private static String[] hspellFilePaths = {"plugins/analysis-hebrew/hspell-data-files/", "/var/lib/hspell-data-files/", home + "/hspell-data-files/"};
-    private static String DEFAULT_HSPELL_PREFIX= HSpellLoader.getHspellPath() + HSpellLoader.PREFIX_NOH;
+    private static String DEFAULT_HSPELL_PREFIX = HSpellLoader.PREFIX_NOH;
     private static DictHebMorph dict = null;
 
     public static DictHebMorph getDictionary() {
@@ -47,7 +47,7 @@ public class DictReceiver {
                 try {
                     System.out.println("Successfully loaded from: " + hspell_folder);
                     HSpellLoader loader = new HSpellLoader(file, true);
-                    dict = loader.loadDictionaryFromHSpellData(DEFAULT_HSPELL_PREFIX);
+                    dict = loader.loadDictionaryFromHSpellData(file + "/" + DEFAULT_HSPELL_PREFIX);
                     return true;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -76,7 +76,7 @@ public class DictReceiver {
                 try {
                     System.out.println("Successfully loaded from: " + file.getAbsolutePath());
                     HSpellLoader loader = new HSpellLoader(file, true);
-                    return loader.loadDictionaryFromHSpellData(DEFAULT_HSPELL_PREFIX);
+                    return loader.loadDictionaryFromHSpellData(file + "/" + DEFAULT_HSPELL_PREFIX);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
