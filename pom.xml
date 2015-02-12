@@ -1,26 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.code972</groupId>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lucene.version>4.10.2</lucene.version>
+        <elasticsearch.version>1.4.2</elasticsearch.version>
+    </properties>
+    
+    <groupId>com.code972.hebmorph</groupId>
     <artifactId>elasticsearch-analysis-hebrew</artifactId>
     <version>1.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>elasticsearch-analysis-hebrew</name>
     <url>http://code972.com/</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>4.10.2</lucene.version>
-        <elasticsearch.version>1.4.2</elasticsearch.version>
-    </properties>
-
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
 
     <licenses>
         <license>
@@ -33,6 +27,7 @@
             </comments>
         </license>
     </licenses>
+    
     <developers>
         <developer>
             <id>synhershko</id>
@@ -40,6 +35,7 @@
             <url>http://code972.com</url>
         </developer>
     </developers>
+    
     <scm>
         <url>https://github.com/synhershko/elasticsearch-analysis-hebrew/</url>
         <connection>scm:git:ssh://git@github.com/synhershko/elasticsearch-analysis-hebrew.git</connection>
@@ -90,17 +86,75 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>perform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
-    <repositories>
+    <distributionManagement>
         <repository>
-            <id>repo-id</id>
-            <name>repo-name</name>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <id>bintray-egozy-hebmorphtemp-elasticsearch-analysis-hebrew</id>
+            <name>sbintray-egozy-hebmorphtemp-elasticsearch-analysis-hebrew</name>
+            <url>https://api.bintray.com/maven/egozy/hebmorphtemp/elasticsearch-analysis-hebrew</url>
         </repository>
-    </repositories>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -113,17 +167,19 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
             <version>${lucene.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
             <version>${lucene.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
@@ -135,8 +191,8 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>17.0</version>
+            <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
