@@ -1,9 +1,11 @@
 package com.code972.elasticsearch.rest.action;
 
-import com.code972.elasticsearch.analysis.HebrewAnalyzer;
-import com.code972.elasticsearch.analysis.HebrewQueryLightAnalyzer;
+import com.code972.elasticsearch.plugins.DictReceiver;
+import com.code972.hebmorph.WordType;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.hebrew.HebrewAnalyzer;
+import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.inject.Inject;
@@ -22,8 +24,8 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
  */
 public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     @Inject
-    public RestHebrewAnalyzerCheckWordAction(Settings settings, Client client, RestController controller) {
-        super(settings, client);
+    public RestHebrewAnalyzerCheckWordAction(Settings settings, Client client, RestController controller) throws IOException {
+        super(settings, controller, client);
         controller.registerHandler(GET, "/_hebrew/check-word/{word}", this);
     }
 
@@ -31,12 +33,11 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     protected void handleRequest(RestRequest request, RestChannel channel, Client client) throws Exception {
         final String word = request.param("word");
         final boolean tolerate = request.paramAsBoolean("tolerate", true);
-        HebrewAnalyzer.WordType wordType = HebrewAnalyzer.isRecognizedWord(word, tolerate);
-
+        WordType wordType = HebrewAnalyzer.isRecognizedWord(word, tolerate, DictReceiver.getDictionary());
         XContentBuilder builder = channel.newBuilder().startObject();
         builder.field("word", word);
         builder.field("wordType", wordType);
-        if (wordType != HebrewAnalyzer.WordType.UNRECOGNIZED && wordType != HebrewAnalyzer.WordType.NON_HEBREW) {
+        if (wordType != WordType.UNRECOGNIZED && wordType != WordType.NON_HEBREW) {
             builder.startArray("lemmas");
             for (String lemma : getLemmas(word)) {
                 builder.value(lemma);
@@ -44,13 +45,12 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
             builder.endArray();
         }
         builder.endObject();
-
         channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
     }
 
-    public static List<String> getLemmas(String word) throws IOException {
+    public List<String> getLemmas(String word) throws IOException {
         List<String> ret = new ArrayList<>();
-        Analyzer a = new HebrewQueryLightAnalyzer();
+        Analyzer a = new HebrewQueryLightAnalyzer(DictReceiver.getDictionary());
         TokenStream ts = a.tokenStream("foo", word);
         ts.reset();
         while (ts.incrementToken()) {
@@ -58,7 +58,6 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
             ret.add(new String(cta.buffer(), 0, cta.length()));
         }
         ts.close();
-        a.close();
         return ret;
     }
 }

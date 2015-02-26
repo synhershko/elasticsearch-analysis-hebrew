@@ -1,6 +1,6 @@
 package com.code972.elasticsearch.plugins;
 
-import com.code972.elasticsearch.analysis.HebrewExactAnalyzer;
+import org.apache.lucene.analysis.hebrew.HebrewExactAnalyzer;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.inject.assistedinject.Assisted;
 import org.elasticsearch.common.settings.Settings;
@@ -17,7 +17,7 @@ public class HebrewExactAnalyzerProvider extends AbstractIndexAnalyzerProvider<H
     @Inject
     public HebrewExactAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
         super(index, indexSettings, name, settings);
-        analyzer = new HebrewExactAnalyzer();
+        analyzer = new HebrewExactAnalyzer(DictReceiver.getDictionary());
     }
 
     @Override
