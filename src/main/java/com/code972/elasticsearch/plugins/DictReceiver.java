@@ -44,7 +44,13 @@ public class DictReceiver {
             file = new File(path);
             if (file.exists()) {
                 try {
+<<<<<<< HEAD
                     return DictionaryLoader.loadDictFromPath(path);
+=======
+                    DictHebMorph ret = DictionaryLoader.loadDictFromPath(path);
+                    System.out.println("Successfully loaded from: " + file.getAbsolutePath());
+                    return ret;
+>>>>>>> Elasticsearch version update to 1.4.4. Matches Hebmorph 2.0.3 API.
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
