@@ -22,8 +22,12 @@ public class AnalysisPlugin extends AbstractPlugin {
      * If hspell.folder.path is defined and no hebrew dictionary is defined, try loading that.
      */
     public AnalysisPlugin(Settings settings) {
-        if (!DictReceiver.setHebmorphDictionary(settings.get("hebrew.dict.path"))) {
-            DictReceiver.setHspellDictionary(settings.get("hspell.folder.path"));
+        if (!DictReceiver.setDictionary(settings.get("hebrew.dict.path"))) {
+            if (!DictReceiver.setDictionary(settings.get("hspell.folder.path"))){
+                if (DictReceiver.getDictionary()==null){
+                    throw new IllegalArgumentException("Could not load any dictionary. Aborting!");
+                }
+            }
         }
     }
 
