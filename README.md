@@ -6,6 +6,8 @@ Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under 
 
 ## Installation
 
+First, install the plugin by invoking the command which fits your elasticsearch version:
+
 ~/elasticsearch-0.90.11$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.0.zip
 
 ~/elasticsearch-1.0.0$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.2.zip
@@ -13,6 +15,15 @@ Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under 
 ~/elasticsearch-1.2.1$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.4.zip
 
 ~/elasticsearch-1.3.2$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.5.zip
+
+~/elasticsearch-1.4.4$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.6.zip
+(Coming soon)
+
+You will need hebrew dictionary files. The open-sourced hspell files can be downloaded here: https://github.com/synhershko/HebMorph/tree/master/hspell-data-files. Next, Elasticsearch needs to be configured to load the dictionary from that folder: this is done by adding the following line to elasticsearch.yml file:
+```
+    hspell.folder.path: PATH/TO/HSPELL/FOLDER/
+```
+The easiest way to make sure the plugin is installed correctly is to request /_hebrew/check-word/בדיקה on your server (for example: browse to http://localhost:9200/_hebrew/check-word/בדיקה). If it loads, it means everything is set up and you are good to go.
 
 ## Usage
 
