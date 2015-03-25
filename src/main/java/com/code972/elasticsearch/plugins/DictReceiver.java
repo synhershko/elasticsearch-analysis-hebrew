@@ -29,7 +29,6 @@ public class DictReceiver {
             if (file.exists()) {
                 try {
                     dict = DictionaryLoader.loadDictFromPath(path);
-                    System.out.println("Successfully loaded from: " + path);
                     return true;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -45,9 +44,7 @@ public class DictReceiver {
             file = new File(path);
             if (file.exists()) {
                 try {
-                    DictHebMorph ret = DictionaryLoader.loadDictFromPath(path);
-                    System.out.println("Successfully loaded from: " + file.getAbsolutePath());
-                    return ret;
+                    return DictionaryLoader.loadDictFromPath(path);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
