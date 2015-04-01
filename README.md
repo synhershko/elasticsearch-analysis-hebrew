@@ -6,17 +6,11 @@ Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under 
 
 ## Installation
 
-First, install the plugin by invoking the command which fits your elasticsearch version:
-
-~/elasticsearch-0.90.11$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.0.zip
-
-~/elasticsearch-1.0.0$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.2.zip
-
-~/elasticsearch-1.2.1$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.4.zip
-
-~/elasticsearch-1.3.2$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.5.zip
-
-~/elasticsearch-1.4.4$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.6.zip
+First, install the plugin by invoking the command which fits your elasticsearch version (older versions can be found at the bottom):
+Elasticsearch versions 1.4.0 - 1.5:
+```
+    bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.6.zip
+```
 (Coming soon)
 
 You will need hebrew dictionary files. The open-sourced hspell files can be downloaded here: https://github.com/synhershko/HebMorph/tree/master/hspell-data-files. Next, Elasticsearch needs to be configured to load the dictionary from that folder: this is done by adding the following line to elasticsearch.yml file:
@@ -44,6 +38,16 @@ More documentation coming soon
 [Qbox.io](http://qbox.io/) allow this plugin to be installed on all of their cluster offerings:
 
 ![Hebrew analysis plugin on qbox.io](http://cdn2.hubspot.net/hub/307608/file-525764352-png/Hebrew-Analysis.png?t=1392398980000)
+
+## Older Versions
+
+~/elasticsearch-0.90.11$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.0.zip
+
+~/elasticsearch-1.0.0$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.2.zip
+
+~/elasticsearch-1.2.1$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.4.zip
+
+~/elasticsearch-1.3.2$ bin/plugin --install analysis-hebrew --url http://dl.bintray.com/synhershko/HebMorph/elasticsearch-analysis-hebrew-1.5.zip
 
 ## License
 
