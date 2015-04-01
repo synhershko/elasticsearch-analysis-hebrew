@@ -19,21 +19,13 @@ public class AnalysisPlugin extends AbstractPlugin {
     /**
      * Attempts to load a dictionary from paths specified in elasticsearch.yml.
      * If hebrew.dict.path is defined, try loading that.
-     * If hspell.folder.path is defined and no hebrew dictionary is defined, try loading that.
      */
     public AnalysisPlugin(Settings settings) {
         String path = settings.get("hebrew.dict.path");
-        if (path!= null && !path.isEmpty()) {
+        if (path != null && !path.isEmpty()) {
             DictReceiver.setDictionary(path);
-        }else{
-            path = settings.get("hspell.folder.path");
-            if (path!=null && !path.isEmpty()){
-                DictReceiver.setDictionary(path);
-            }else{
-                if (DictReceiver.getDictionary()==null){
-                    throw new IllegalArgumentException("Could not load any dictionary. Aborting!");
-                }
-            }
+        } else if (DictReceiver.getDictionary() == null) {
+            throw new IllegalArgumentException("Could not load any dictionary. Aborting!");
         }
     }
 

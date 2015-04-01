@@ -21,9 +21,13 @@ First, install the plugin by invoking the command which fits your elasticsearch 
 
 You will need hebrew dictionary files. The open-sourced hspell files can be downloaded here: https://github.com/synhershko/HebMorph/tree/master/hspell-data-files. Next, Elasticsearch needs to be configured to load the dictionary from that folder: this is done by adding the following line to elasticsearch.yml file:
 ```
-    hspell.folder.path: PATH/TO/HSPELL/FOLDER/
+    hebrew.dict.path: /PATH/TO/HSPELL/FOLDER
 ```
 The easiest way to make sure the plugin is installed correctly is to request /_hebrew/check-word/בדיקה on your server (for example: browse to http://localhost:9200/_hebrew/check-word/בדיקה). If it loads, it means everything is set up and you are good to go.
+
+## Commercial
+
+Hebmorph is released open-sourced, alongside with hspell dictionary files. The Commercial option will grant you further support in making Hebrew search even better, and it comes with a proprietary dictionary. For more information, check out http://code972.com/hebmorph.
 
 ## Usage
 
