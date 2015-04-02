@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import com.code972.elasticsearch.rest.action.RestHebrewAnalyzerCheckWordAction;
 import static junit.framework.TestCase.assertTrue;
 
 /**
