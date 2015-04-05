@@ -2,7 +2,6 @@ package com.code972.elasticsearch.plugins;
 
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.hspell.HSpellLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +42,7 @@ public class DictReceiver {
         for (String path : filePaths) {
             file = new File(path);
             if (file.exists()) {
+                try{
                     return DictionaryLoader.loadDictFromPath(path);
                 } catch (IOException e) {
                     e.printStackTrace();
