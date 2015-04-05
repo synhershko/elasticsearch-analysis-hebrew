@@ -6,6 +6,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lucene.version>4.10.4</lucene.version>
         <elasticsearch.version>1.5.0</elasticsearch.version>
+        <hebmorph.version>2.0.3</hebmorph.version>
     </properties>
     
     <groupId>com.code972.hebmorph</groupId>
@@ -148,14 +149,6 @@
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>bintray-egozy-hebmorphtemp-elasticsearch-analysis-hebrew</id>
-            <name>sbintray-egozy-hebmorphtemp-elasticsearch-analysis-hebrew</name>
-            <url>https://api.bintray.com/maven/egozy/hebmorphtemp/elasticsearch-analysis-hebrew</url>
-        </repository>
-    </distributionManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -184,7 +177,7 @@
         <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-lucene</artifactId>
-            <version>2.0.3-SNAPSHOT</version>
+            <version>${hebmorph.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
