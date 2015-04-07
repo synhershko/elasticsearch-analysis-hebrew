@@ -10,7 +10,7 @@
     
     <groupId>com.code972.hebmorph</groupId>
     <artifactId>elasticsearch-analysis-hebrew</artifactId>
-    <version>1.6</version>
+    <version>1.7-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>elasticsearch-analysis-hebrew</name>
