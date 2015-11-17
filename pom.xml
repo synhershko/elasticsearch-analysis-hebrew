@@ -10,7 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lucene.version>4.10.4</lucene.version>
-        <elasticsearch.version>1.5.0</elasticsearch.version>
+        <elasticsearch.version>2.0.0</elasticsearch.version>
         <hebmorph.version>2.0.3</hebmorph.version>
     </properties>
     
