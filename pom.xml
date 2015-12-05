@@ -9,16 +9,15 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>4.10.4</lucene.version>
-        <elasticsearch.version>1.5.0</elasticsearch.version>
-        <hebmorph.version>2.0.3</hebmorph.version>
+        <lucene.version>5.3.1</lucene.version>
+        <elasticsearch.version>2.0.1</elasticsearch.version>
+        <hebmorph.version>2.1.0-SNAPSHOT</hebmorph.version>
     </properties>
     
     <groupId>com.code972.hebmorph</groupId>
     <artifactId>elasticsearch-analysis-hebrew</artifactId>
     <version>1.8-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <name>elasticsearch-analysis-hebrew</name>
     <url>http://code972.com/</url>
 
