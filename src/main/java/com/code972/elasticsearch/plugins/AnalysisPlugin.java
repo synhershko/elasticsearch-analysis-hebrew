@@ -1,20 +1,12 @@
 package com.code972.elasticsearch.plugins;
 
 import com.code972.elasticsearch.rest.action.RestHebrewAnalyzerCheckWordAction;
-import org.elasticsearch.common.inject.Module;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.analysis.AnalysisModule;
-import org.elasticsearch.plugins.AbstractPlugin;
+import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.rest.RestModule;
 
-/**
- * Created with IntelliJ IDEA.
- * User: synhershko
- * Date: 10/25/12
- * Time: 3:41 PM
- * To change this template use File | Settings | File Templates.
- */
-public class AnalysisPlugin extends AbstractPlugin {
+public class AnalysisPlugin extends Plugin {
 
     /**
      * Attempts to load a dictionary from paths specified in elasticsearch.yml.
@@ -39,12 +31,13 @@ public class AnalysisPlugin extends AbstractPlugin {
         return "Hebrew analyzer powered by HebMorph";
     }
 
-    @Override
-    public void processModule(Module module) {
-        if (module instanceof AnalysisModule) {
-            ((AnalysisModule) module).addProcessor(new HebrewAnalysisBinderProcessor());
-        } else if (module instanceof RestModule) {
-            ((RestModule) module).addRestAction(RestHebrewAnalyzerCheckWordAction.class);
-        }
+    /* Invoked on component assembly. */
+    public void onModule(AnalysisModule analysisModule) {
+        analysisModule.addProcessor(new HebrewAnalysisBinderProcessor());
+    }
+
+    /* Invoked on component assembly. */
+    public void onModule(RestModule restModule) {
+        restModule.addRestAction(RestHebrewAnalyzerCheckWordAction.class);
     }
 }
