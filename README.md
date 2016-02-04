@@ -7,7 +7,7 @@ Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under 
 ## Installation
 
 First, install the plugin by invoking the command which fits your elasticsearch version (older versions can be found at the bottom):
-Elasticsearch versions 1.4.0 - 1.5:
+Elasticsearch versions 1.4.0 - 1.7.3:
 ```
     bin/plugin --install analysis-hebrew --url https://bintray.com/artifact/download/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-1.7.zip
 ```
