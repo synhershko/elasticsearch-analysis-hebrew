@@ -13,7 +13,7 @@ public class AnalysisPlugin extends Plugin {
      * If hebrew.dict.path is defined, try loading that.
      */
     public AnalysisPlugin(Settings settings) {
-        String path = settings.get("hebrew.dict.path");
+        final String path = settings.get("hebrew.dict.path");
         if (path != null && !path.isEmpty()) {
             DictReceiver.setDictionary(path);
         } else if (DictReceiver.getDictionary() == null) {

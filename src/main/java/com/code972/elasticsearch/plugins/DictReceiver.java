@@ -5,14 +5,17 @@ import com.code972.hebmorph.datastructures.DictHebMorph;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import org.elasticsearch.SpecialPermission;
 
 /**
- * Created by Egozy on 03/12/2014.
+ * This class will try to locate the dictionary to load, and call the DictionaryLoader class with the files it found
+ * to initialize loading them and initializing the HebMorph analyzers.
  */
 public class DictReceiver {
-    private static String home = System.getProperty("user.home");
-    private static String[] filePaths = {"plugins/analysis-hebrew/dictionary.dict", "/var/lib/hebmorph/dictionary.dict", home + "/hebmorph/dictionary.dict", 
-                                            "plugins/analysis-hebrew/hspell-data-files/", "/var/lib/hspell-data-files/", home + "/hspell-data-files/"};
+    private static String[] filePaths = {"plugins/analysis-hebrew/dictionary.dict", "/var/lib/hebmorph/dictionary.dict",
+                                            "plugins/analysis-hebrew/hspell-data-files/", "/var/lib/hspell-data-files/"};
     private static DictHebMorph dict = null;
 
     public static DictHebMorph getDictionary() {
@@ -22,32 +25,56 @@ public class DictReceiver {
         return dict;
     }
 
-    public static boolean setDictionary(String path) {
-        if (path != null) {
-            File file = new File(path);
+    private static class LoadDictAction implements PrivilegedAction<DictHebMorph> {
+
+        private final String path;
+
+        public LoadDictAction(final String path) {
+            this.path = path;
+        }
+
+        @Override
+        public DictHebMorph run() {
+            final File file = new File(path);
             if (file.exists()) {
                 try {
-                    dict = DictionaryLoader.loadDictFromPath(path);
-                    return true;
+                    return DictionaryLoader.loadDictFromPath(path);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+            return null;
+        }
+    }
+
+    public static boolean setDictionary(String path) {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            // unprivileged code such as scripts do not have SpecialPermission
+            sm.checkPermission(new SpecialPermission());
+        }
+
+        if (path != null) {
+            final DictHebMorph tmp = AccessController.doPrivileged(new LoadDictAction(path));
+            if (dict != null) {
+                dict = tmp;
+                return true;
             }
         }
         return false;
     }
 
     private static DictHebMorph setDefaultDictionary() {
-        File file;
-        for (String path : filePaths) {
-            file = new File(path);
-            if (file.exists()) {
-                try{
-                    return DictionaryLoader.loadDictFromPath(path);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            // unprivileged code such as scripts do not have SpecialPermission
+            sm.checkPermission(new SpecialPermission());
+        }
+
+        for (final String path : filePaths) {
+            final DictHebMorph dict = AccessController.doPrivileged(new LoadDictAction(path));
+            if (dict != null)
+                return dict;
         }
         throw new IllegalArgumentException("Could not load any dictionary. Aborting!");
     }
