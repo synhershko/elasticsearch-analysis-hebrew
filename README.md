@@ -48,12 +48,6 @@ Because Hebrew uses quote marks to mark acronyms, it is recommended to use the m
 
 More documentation coming soon
 
-## On the cloud
-
-[Qbox.io](http://qbox.io/) allow this plugin to be installed on all of their cluster offerings:
-
-![Hebrew analysis plugin on qbox.io](http://cdn2.hubspot.net/hub/307608/file-525764352-png/Hebrew-Analysis.png?t=1392398980000)
-
 ## Older Versions
 
 Elasticsearch versions 1.4.0 - 1.7.3:
