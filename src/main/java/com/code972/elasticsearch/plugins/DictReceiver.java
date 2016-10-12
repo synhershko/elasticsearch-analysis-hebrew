@@ -1,13 +1,13 @@
 package com.code972.elasticsearch.plugins;
 
-import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
+import com.code972.hebmorph.hspell.HSpellDictionaryLoader;
+import org.elasticsearch.SpecialPermission;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import org.elasticsearch.SpecialPermission;
 
 /**
  * This class will try to locate the dictionary to load, and call the DictionaryLoader class with the files it found
@@ -28,9 +28,11 @@ public class DictReceiver {
     private static class LoadDictAction implements PrivilegedAction<DictHebMorph> {
 
         private final String path;
+        private final HSpellDictionaryLoader loader;
 
         public LoadDictAction(final String path) {
             this.path = path;
+            this.loader = new HSpellDictionaryLoader();
         }
 
         @Override
@@ -38,7 +40,7 @@ public class DictReceiver {
             final File file = new File(path);
             if (file.exists()) {
                 try {
-                    return DictionaryLoader.loadDictFromPath(path);
+                    return loader.loadDictionaryFromPath(path);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
