@@ -26,13 +26,19 @@ for descriptions of what these permissions allow and the associated risks.
 
 This is normal - please confirm by typing y and hitting Enter.
 
-You will need the Hebrew dictionary files. The open-sourced hspell files can be downloaded here: https://github.com/synhershko/HebMorph/tree/master/hspell-data-files. Next, Elasticsearch needs to be configured to load the dictionary from that folder: this is done by adding the following line to elasticsearch.yml file:
+You will need the Hebrew dictionary files. The open-sourced hspell files can be downloaded here: https://github.com/synhershko/HebMorph/tree/master/hspell-data-files. Download the entire folder and copy it to be either in the plugin's folder (meaning, `plugins/analysis-hebrew/hspell-data-files`) or under `/var/lib/hspell-data-files`.
+
+Alternatively, Elasticsearch can be configured to load the dictionary from another folder, this is done by adding the following line to elasticsearch.yml file:
 
 ```
     hebrew.dict.path: /PATH/TO/HSPELL/FOLDER
 ```
 
-The easiest way to make sure the plugin is installed correctly is to request /_hebrew/check-word/בדיקה on your server (for example: browse to http://localhost:9200/_hebrew/check-word/בדיקה). If it loads, it means everything is set up and you are good to go.
+You will also need to edit `plugin-security.policy` accordingly.
+
+The dictionary used in by the commercial verion follows a similar pattern.
+
+The easiest way to make sure the plugin is installed correctly is to request /_hebrew/check-word/בדיקה on your server (for example: browse to `http://localhost:9200/_hebrew/check-word/בדיקה`). If it loads, it means everything is set up and you are good to go.
 
 ## Commercial
 
