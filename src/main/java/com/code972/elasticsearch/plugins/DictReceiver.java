@@ -1,7 +1,7 @@
 package com.code972.elasticsearch.plugins;
 
+import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
-import com.code972.hebmorph.hspell.HSpellDictionaryLoader;
 import org.elasticsearch.SpecialPermission;
 
 import java.io.File;
@@ -14,25 +14,20 @@ import java.security.PrivilegedAction;
  * to initialize loading them and initializing the HebMorph analyzers.
  */
 public class DictReceiver {
-    private static String[] filePaths = {"plugins/analysis-hebrew/dictionary.dict", "/var/lib/hebmorph/dictionary.dict",
-                                            "plugins/analysis-hebrew/hspell-data-files/", "/var/lib/hspell-data-files/"};
     private static DictHebMorph dict = null;
 
     public static DictHebMorph getDictionary() {
-        if (dict == null) {
-            dict = setDefaultDictionary();
-        }
         return dict;
     }
 
     private static class LoadDictAction implements PrivilegedAction<DictHebMorph> {
 
         private final String path;
-        private final HSpellDictionaryLoader loader;
+        private final DictionaryLoader loader;
 
-        public LoadDictAction(final String path) {
+        public LoadDictAction(final String path, final DictionaryLoader loader) {
             this.path = path;
-            this.loader = new HSpellDictionaryLoader();
+            this.loader = loader;
         }
 
         @Override
@@ -42,6 +37,7 @@ public class DictReceiver {
                 try {
                     return loader.loadDictionaryFromPath(path);
                 } catch (IOException e) {
+                    // TODO remove printing
                     e.printStackTrace();
                 }
             }
@@ -49,7 +45,7 @@ public class DictReceiver {
         }
     }
 
-    public static boolean setDictionary(String path) {
+    public static boolean setDictionary(DictionaryLoader loader, String path) {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             // unprivileged code such as scripts do not have SpecialPermission
@@ -57,24 +53,25 @@ public class DictReceiver {
         }
 
         if (path != null) {
-            final DictHebMorph tmp = AccessController.doPrivileged(new LoadDictAction(path));
+            final DictHebMorph tmp = AccessController.doPrivileged(new LoadDictAction(path, loader));
             if (dict != null) {
                 dict = tmp;
                 return true;
             }
         }
+
         return false;
     }
 
-    private static DictHebMorph setDefaultDictionary() {
+    public static DictHebMorph setDictionary(DictionaryLoader loader) {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             // unprivileged code such as scripts do not have SpecialPermission
             sm.checkPermission(new SpecialPermission());
         }
 
-        for (final String path : filePaths) {
-            final DictHebMorph dict = AccessController.doPrivileged(new LoadDictAction(path));
+        for (final String path : loader.dictionaryPossiblePaths()) {
+            final DictHebMorph dict = AccessController.doPrivileged(new LoadDictAction(path, loader));
             if (dict != null)
                 return dict;
         }

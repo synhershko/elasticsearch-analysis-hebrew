@@ -1,6 +1,9 @@
 package com.code972.elasticsearch.plugins;
 
 import com.code972.elasticsearch.rest.action.RestHebrewAnalyzerCheckWordAction;
+import com.code972.hebmorph.DictionaryLoader;
+import com.code972.hebmorph.hspell.HSpellDictionaryLoader;
+import com.google.common.reflect.Reflection;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.analysis.AnalysisModule;
 import org.elasticsearch.plugins.Plugin;
@@ -13,13 +16,31 @@ public class AnalysisPlugin extends Plugin {
      * If hebrew.dict.path is defined, try loading that.
      */
     public AnalysisPlugin(Settings settings) {
+        final DictionaryLoader loader;
+
+        // TODO try locating HebMorphDictionaryLoader
+        loader = new HSpellDictionaryLoader();
+
+        Class dictLoader;
+
+
+        // TODO log dictionary loader used
+
+        // If a specific dictionary path was specified, force to use that
         final String path = settings.get("hebrew.dict.path");
         if (path != null && !path.isEmpty()) {
-            DictReceiver.setDictionary(path);
-        } else if (DictReceiver.getDictionary() == null) {
+            DictReceiver.setDictionary(loader, path);
+        } else {
+            // Default to loading from default locations
+            DictReceiver.setDictionary(loader);
+        }
+
+        if (DictReceiver.getDictionary() == null) {
             throw new IllegalArgumentException("Could not load any dictionary. Aborting!");
         }
     }
+
+
 
     @Override
     public String name() {
