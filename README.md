@@ -9,7 +9,7 @@ Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under 
 First, install the plugin by invoking the command which fits your elasticsearch version (older versions can be found at the bottom):
 
 ```
-./bin/plugin install https://bintray.com/synhershko/elasticsearch-analysis-hebrew/download_file?file_path=elasticsearch-analysis-hebrew-2.4.2.zip
+./bin/plugin install https://bintray.com/synhershko/elasticsearch-analysis-hebrew/download_file?file_path=elasticsearch-analysis-hebrew-2.4.2
 ```
 
 During installation, you may be prompted for additional permissions:
