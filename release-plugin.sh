@@ -8,6 +8,8 @@ export HEBMORPH_LUCENE_VERSION=2.4.0
 export RELEASE_PATH="./releases/elasticsearch-analysis-hebrew-$1/"
 mkdir -p ${RELEASE_PATH}
 
+cp plugin-descriptor.properties.template plugin-descriptor.properties
+cp pom.xml.template pom.xml
 sed -i '.bak' "s/ES-PLUGIN-VERSION/$1/" plugin-descriptor.properties
 sed -i '.bak' "s/ES-PLUGIN-VERSION/$1/" pom.xml
 mvn clean
@@ -24,6 +26,5 @@ popd
 
 # reset run
 cp plugin-descriptor.properties.template plugin-descriptor.properties
-cp pom.xml.template pom.xml
 
 # TODO push to bintray
