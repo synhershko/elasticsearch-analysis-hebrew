@@ -1,4 +1,6 @@
 target/
+releases/
 .idea/
 *.iml
 *.ipr
+*.bak
