@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 echo "Releasing elasticsearch-analysis-hebrew version $1"
@@ -27,4 +26,5 @@ popd
 # reset run
 cp plugin-descriptor.properties.template plugin-descriptor.properties
 
-# TODO push to bintray
+# publish to bintray
+curl -T elasticsearch-analysis-hebrew-$1.zip -usynhershko:$BINTRAY_API_KEY "https://api.bintray.com/content/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-plugin/$1/elasticsearch-analysis-hebrew-$1?publish=1"
