@@ -2,14 +2,14 @@
 
 Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under the AGPL3
 
-![](https://travis-ci.org/synhershko/elasticsearch-analysis-hebrew.svg?branch=master)
+![](https://travis-ci.org/synhershko/elasticsearch-analysis-hebrew.svg?branch=master) [ ![Download](https://api.bintray.com/packages/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-plugin/images/download.svg) ](https://bintray.com/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-plugin/_latestVersion)
 
 ## Installation
 
 First, install the plugin by invoking the command which fits your elasticsearch version (older versions can be found at the bottom):
 
 ```
-./bin/plugin install https://bintray.com/synhershko/elasticsearch-analysis-hebrew/download_file?file_path=elasticsearch-analysis-hebrew-2.3.4.zip
+./bin/plugin install https://bintray.com/synhershko/elasticsearch-analysis-hebrew/download_file?file_path=elasticsearch-analysis-hebrew-2.4.2.zip
 ```
 
 During installation, you may be prompted for additional permissions:
