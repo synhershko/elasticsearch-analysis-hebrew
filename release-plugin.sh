@@ -21,10 +21,11 @@ zip "elasticsearch-analysis-hebrew-$1.zip" "elasticsearch-analysis-hebrew-$1.jar
 
 cp ~/packaging/* .
 zip "elasticsearch-analysis-hebrew-$1-commercial.zip" "elasticsearch-analysis-hebrew-$1.jar" plugin-descriptor.properties plugin-security.policy dictionary.dict "hebmorph-lucene-commercial-$HEBMORPH_LUCENE_VERSION.jar"
+
+# publish to bintray
+curl -T elasticsearch-analysis-hebrew-$1.zip -usynhershko:$BINTRAY_API_KEY "https://api.bintray.com/content/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-plugin/$1/elasticsearch-analysis-hebrew-$1?publish=1"
+
 popd
 
 # reset run
 cp plugin-descriptor.properties.template plugin-descriptor.properties
-
-# publish to bintray
-curl -T elasticsearch-analysis-hebrew-$1.zip -usynhershko:$BINTRAY_API_KEY "https://api.bintray.com/content/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-plugin/$1/elasticsearch-analysis-hebrew-$1?publish=1"
