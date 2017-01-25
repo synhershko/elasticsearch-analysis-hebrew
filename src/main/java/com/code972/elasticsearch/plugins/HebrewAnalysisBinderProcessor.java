@@ -27,4 +27,16 @@ public class HebrewAnalysisBinderProcessor extends AnalysisModule.AnalysisBinder
             analyzersBindings.processAnalyzer(entry.getKey(), entry.getValue());
         }
     }
+
+    @Override
+    public void processTokenizers(TokenizersBindings tokenizersBindings) {
+        tokenizersBindings.processTokenizer("hebrew_tokenizer", HebrewTokenizerFactory.class);
+    }
+
+    @Override
+    public void processTokenFilters(TokenFiltersBindings tokenFiltersBindings) {
+        tokenFiltersBindings.processTokenFilter("add_suffix", AddSuffixTokenFilterFactory.class);
+        tokenFiltersBindings.processTokenFilter("hebrew_lemmatizer", HebrewLemmatizerTokenFilterFactory.class);
+        tokenFiltersBindings.processTokenFilter("niqqud_filter", NiqqudFilterTokenFilterFactory.class);
+    }
 }
