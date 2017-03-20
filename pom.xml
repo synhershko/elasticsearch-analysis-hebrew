@@ -9,14 +9,14 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>6.2.0</lucene.version>
-        <elasticsearch.version>5.0.0</elasticsearch.version>
-        <hebmorph.version>6.0.0</hebmorph.version>
+        <lucene.version>6.4.0</lucene.version>
+        <hebmorph.version>6.4.0</hebmorph.version>
+        <elasticsearch.version>5.2.2</elasticsearch.version>
     </properties>
     
     <groupId>com.code972.hebmorph</groupId>
     <artifactId>elasticsearch-analysis-hebrew</artifactId>
-    <version>5.0.0</version>
+    <version>5.2.2</version>
     <packaging>jar</packaging>
     <name>elasticsearch-analysis-hebrew</name>
     <url>http://code972.com/</url>
@@ -190,17 +190,11 @@
             <version>${hebmorph.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>17.0</version>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.6.2</version>
+            <version>2.7</version>
             <scope>provided</scope>
         </dependency>
 
