@@ -3,7 +3,7 @@ set -e
 
 echo "Releasing elasticsearch-analysis-hebrew version $1"
 
-export HEBMORPH_LUCENE_VERSION=6.2.1
+export HEBMORPH_LUCENE_VERSION=6.4.0
 export RELEASE_PATH="./releases/elasticsearch-analysis-hebrew-$1"
 mkdir -p ${RELEASE_PATH}/elasticsearch/hspell-data-files
 
@@ -11,6 +11,7 @@ cp plugin-descriptor.properties.template plugin-descriptor.properties
 cp pom.xml.template pom.xml
 sed -i '.bak' "s/ES-PLUGIN-VERSION/$1/" plugin-descriptor.properties
 sed -i '.bak' "s/ES-PLUGIN-VERSION/$1/" pom.xml
+sed -i '.bak' "s/HEBMORPH-LUCENE-VERSION/$HEBMORPH_LUCENE_VERSION/" pom.xml
 mvn clean
 mvn package
 
