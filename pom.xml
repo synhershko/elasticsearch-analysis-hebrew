@@ -9,7 +9,7 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>6.2.1</lucene.version>
+        <lucene.version>6.2.0</lucene.version>
         <elasticsearch.version>5.0.0</elasticsearch.version>
         <hebmorph.version>6.0.0</hebmorph.version>
     </properties>
@@ -179,6 +179,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.elasticsearch.test</groupId>
+            <artifactId>framework</artifactId>
+            <version>${elasticsearch.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.code972.hebmorph</groupId>
             <artifactId>hebmorph-lucene</artifactId>
             <version>${hebmorph.version}</version>
@@ -190,6 +196,14 @@
             <version>17.0</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.6.2</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
