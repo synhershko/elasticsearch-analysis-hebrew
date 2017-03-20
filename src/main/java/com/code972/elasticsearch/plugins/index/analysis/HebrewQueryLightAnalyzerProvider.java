@@ -1,13 +1,12 @@
-package com.code972.elasticsearch.plugins;
+package com.code972.elasticsearch.plugins.index.analysis;
 
+import com.code972.hebmorph.datastructures.DictHebMorph;
 import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
 import org.elasticsearch.common.inject.Inject;
-import org.elasticsearch.common.inject.assistedinject.Assisted;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
-import org.elasticsearch.index.Index;
+import org.elasticsearch.index.IndexSettings;
 import org.elasticsearch.index.analysis.AbstractIndexAnalyzerProvider;
-import org.elasticsearch.index.settings.IndexSettingsService;
 
 import java.io.IOException;
 
@@ -15,9 +14,10 @@ public class HebrewQueryLightAnalyzerProvider extends AbstractIndexAnalyzerProvi
     private final HebrewQueryLightAnalyzer hebrewAnalyzer;
 
     @Inject
-    public HebrewQueryLightAnalyzerProvider(Index index, IndexSettingsService indexSettingsService, Environment env, @Assisted String name, @Assisted Settings settings) throws IOException {
-        super(index, indexSettingsService.getSettings(), name, settings);
-        hebrewAnalyzer = new HebrewQueryLightAnalyzer(DictReceiver.getDictionary());
+    public HebrewQueryLightAnalyzerProvider(IndexSettings indexSettings, Environment env, String name, Settings settings,
+                                            final DictHebMorph dict) throws IOException {
+        super(indexSettings, name, settings);
+        hebrewAnalyzer = new HebrewQueryLightAnalyzer(dict);
         hebrewAnalyzer.setVersion(this.version);
     }
 
