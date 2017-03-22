@@ -9,6 +9,12 @@ Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under 
 First, install the plugin by invoking the command which fits your elasticsearch version (older versions can be found at the bottom):
 
 ```
+./bin/elasticsearch-plugin install https://bintray.com/synhershko/elasticsearch-analysis-hebrew/download_file?file_path=elasticsearch-analysis-hebrew-5.2.2.zip
+```
+
+For earlier versions (2.x and before) the installation looks a bit different:
+
+```
 ./bin/plugin install https://bintray.com/synhershko/elasticsearch-analysis-hebrew/download_file?file_path=elasticsearch-analysis-hebrew-2.4.2
 ```
 
@@ -26,9 +32,13 @@ for descriptions of what these permissions allow and the associated risks.
 
 This is normal - please confirm by typing y and hitting Enter.
 
-You will need the Hebrew dictionary files. The open-sourced hspell files can be downloaded here: https://github.com/synhershko/HebMorph/tree/master/hspell-data-files. Download the entire folder and copy it to be either in the plugin's folder (meaning, `plugins/analysis-hebrew/hspell-data-files`) or under `/var/lib/hspell-data-files`.
+## Dictionaries
 
-Alternatively, Elasticsearch can be configured to load the dictionary from another folder, this is done by adding the following line to elasticsearch.yml file:
+This plugin uses dictionary files for it's operation. The open-source version is using hspell data files. In the 5.x versions, the dictionaries are bundled in the plugin download itself.
+
+For earlier versions, you will need to obtain the Hebrew dictionary files yourself. The open-sourced hspell files can be downloaded here: https://github.com/synhershko/HebMorph/tree/master/hspell-data-files. Download the entire folder and copy it to be either in the plugin's folder (meaning, `plugins/analysis-hebrew/hspell-data-files`) or under `/var/lib/hspell-data-files`.
+
+Elasticsearch can also be configured to load the dictionary from another folder, this is done by adding the following line to elasticsearch.yml file:
 
 ```
     hebrew.dict.path: /PATH/TO/HSPELL/FOLDER
@@ -38,7 +48,15 @@ You will also need to edit `plugin-security.policy` accordingly.
 
 The dictionary used in by the commercial verion follows a similar pattern.
 
-The easiest way to make sure the plugin is installed correctly is to request /_hebrew/check-word/בדיקה on your server (for example: browse to `http://localhost:9200/_hebrew/check-word/בדיקה`). If it loads, it means everything is set up and you are good to go.
+You can confirm installation by launching elasticsearch and seeing the following in the logs:
+
+```
+[2017-03-22T15:43:05,927][INFO ][c.c.e.HebrewAnalysisPlugin] Defaulting to HSpell dictionary loader
+[2017-03-22T15:43:07,751][INFO ][c.c.e.HebrewAnalysisPlugin] Trying to load hspell from path plugins/analysis-hebrew/hspell-data-files/
+[2017-03-22T15:43:07,751][INFO ][c.c.e.HebrewAnalysisPlugin] Dictionary 'hspell' loaded successfully from path plugins/analysis-hebrew/hspell-data-files/
+```
+
+The easiest way to make sure the plugin is installed correctly is to request `/_hebrew/check-word/בדיקה` on your server (for example: browse to http://localhost:9200/_hebrew/check-word/בדיקה). If it loads, it means everything is set up and you are good to go.
 
 ## Commercial
 
@@ -52,7 +70,37 @@ Query using "hebrew_query" or "hebrew_query_light" to enable exact matches suppo
 
 Because Hebrew uses quote marks to mark acronyms, it is recommended to use the match family queries and not query_string. This is the official recommendation anyway. This plugin does not currently ship with a QueryParser implementation that can be used to power query_string queries.
 
-More documentation coming soon
+Here is a sample Sense / Console syntax demonstrating usage of the analyzers in this plugin:
+
+```
+PUT test-hebrew
+{
+    "mappings": {
+        "test": {
+            "properties": {
+                "content": {
+                    "type": "text",
+                    "analyzer": "hebrew"
+                }
+            }
+        }
+    }
+}
+
+PUT test-hebrew/test/1
+{
+    "content": "בדיקות"
+}
+
+POST test-hebrew/_search
+{
+    "query": {
+        "match": {
+           "content": "בדיקה"
+        }
+    }
+}
+```
 
 ## Older Versions
 
@@ -71,13 +119,6 @@ Even older versions:
 ~/elasticsearch-1.2.1$ bin/plugin --install analysis-hebrew --url https://bintray.com/artifact/download/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-1.4.zip
 
 ~/elasticsearch-1.3.2$ bin/plugin --install analysis-hebrew --url https://bintray.com/artifact/download/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-1.5.zip
-
-## Releasing
-
-```
-➜  ~ cp code/elasticsearch-analysis-hebrew/target/elasticsearch-analysis-hebrew-2.3.4.jar code/HebMorph/java/target/hebmorph-lucene-2.3.3.jar code/elasticsearch-analysis-hebrew/plugin-descriptor.properties code/elasticsearch-analysis-hebrew/plugin-security.policy .
-➜  ~ zip elasticsearch-analysis-hebrew-2.3.4.zip elasticsearch-analysis-hebrew-2.3.4.jar hebmorph-lucene-2.3.3.jar plugin-descriptor.properties plugin-security.policy
-```
 
 ## License
 
