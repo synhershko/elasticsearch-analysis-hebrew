@@ -26,7 +26,7 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
  */
 public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     @Inject
-    public RestHebrewAnalyzerCheckWordAction(Settings settings, Client client, RestController controller) throws IOException {
+    public RestHebrewAnalyzerCheckWordAction(Settings settings, RestController controller) {
         super(settings);
         controller.registerHandler(GET, "/_hebrew/check-word/{word}", this);
     }
@@ -58,7 +58,6 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     }
 
     private List<String> getLemmas(final String word, final DictHebMorph dict) throws IOException {
-//        new LowerCaseFilter()
         final List<String> ret = new ArrayList<>();
         final Analyzer a = new HebrewQueryLightAnalyzer(dict);
         final TokenStream ts = a.tokenStream("foo", word);
