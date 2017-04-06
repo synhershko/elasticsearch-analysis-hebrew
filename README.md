@@ -9,7 +9,7 @@ Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under 
 First, install the plugin by invoking the command which fits your elasticsearch version (older versions can be found at the bottom):
 
 ```
-./bin/elasticsearch-plugin install https://bintray.com/synhershko/elasticsearch-analysis-hebrew/download_file?file_path=elasticsearch-analysis-hebrew-5.2.2.zip
+./bin/elasticsearch-plugin install https://bintray.com/synhershko/elasticsearch-analysis-hebrew/download_file?file_path=elasticsearch-analysis-hebrew-5.3.0.zip
 ```
 
 For earlier versions (2.x and before) the installation looks a bit different:
@@ -25,9 +25,13 @@ During installation, you may be prompted for additional permissions:
 @     WARNING: plugin requires additional permissions     @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 * java.io.FilePermission /var/lib/hebmorph/dictionary.dict read
-* java.io.FilePermission /var/lib/hspell-data-files/ read
+* java.io.FilePermission /var/lib/hspell-data-files read
+* java.io.FilePermission /var/lib/hspell-data-files/* read
+* java.lang.RuntimePermission accessClassInPackage.sun.reflect.generics.reflectiveObjects
 See http://docs.oracle.com/javase/8/docs/technotes/guides/security/permissions.html
 for descriptions of what these permissions allow and the associated risks.
+
+Continue with installation? [y/N]y
 ```
 
 This is normal - please confirm by typing y and hitting Enter.
@@ -73,6 +77,8 @@ Because Hebrew uses quote marks to mark acronyms, it is recommended to use the m
 Here is a sample Sense / Console syntax demonstrating usage of the analyzers in this plugin:
 
 ```
+GET /_hebrew/check-word/בדיקה
+
 PUT test-hebrew
 {
     "mappings": {
