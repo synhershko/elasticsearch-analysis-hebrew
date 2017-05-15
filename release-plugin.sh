@@ -3,7 +3,7 @@ set -e
 
 echo "Releasing elasticsearch-analysis-hebrew version $1"
 
-export HEBMORPH_LUCENE_VERSION=6.4.1
+export HEBMORPH_LUCENE_VERSION=6.4.2
 export RELEASE_PATH="./releases/elasticsearch-analysis-hebrew-$1"
 mkdir -p ${RELEASE_PATH}/elasticsearch/hspell-data-files
 

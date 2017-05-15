@@ -15,6 +15,7 @@ import org.elasticsearch.common.settings.ClusterSettings;
 import org.elasticsearch.common.settings.IndexScopedSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.SettingsFilter;
+import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.analysis.AnalyzerProvider;
 import org.elasticsearch.index.analysis.TokenFilterFactory;
 import org.elasticsearch.index.analysis.TokenizerFactory;
@@ -104,7 +105,8 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
             }
         }
 
-        for (final String path : dictLoader.dictionaryPossiblePaths()) {
+        final Environment env = new Environment(settings);
+        for (final String path : dictLoader.getPossiblePaths(env.pluginsFile().resolve("analysis-hebrew").toAbsolutePath().toString())) {
             final DictHebMorph tmp = AccessController.doPrivileged(new LoadDictAction(path, dictLoader));
             log.info("Trying to load {} from path {}", dictLoader.dictionaryLoaderName(), path);
             if (tmp != null) {
