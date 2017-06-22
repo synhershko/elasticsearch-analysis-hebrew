@@ -3,7 +3,7 @@ set -e
 
 echo "Releasing elasticsearch-analysis-hebrew version $1"
 
-export HEBMORPH_LUCENE_VERSION=6.4.2
+export HEBMORPH_LUCENE_VERSION=6.5.1
 export RELEASE_PATH="./releases/elasticsearch-analysis-hebrew-$1"
 mkdir -p ${RELEASE_PATH}/elasticsearch/hspell-data-files
 
@@ -37,8 +37,8 @@ popd
 
 # Package the commercial plugin
 rm -r ${RELEASE_PATH}/elasticsearch/hspell-data-files
-cp ./../hebmorph.dictionary/release/* ${RELEASE_PATH}/elasticsearch
-cp ./../hebmorph.dictionary/hebmorph-dictionary-loader/build/libs/dictionary-loader-$HEBMORPH_LUCENE_VERSION.jar ${RELEASE_PATH}/elasticsearch
+cp ./../hebmorph-dictionary/release/* ${RELEASE_PATH}/elasticsearch
+cp ./../hebmorph-dictionary/hebmorph-dictionary-loader/build/libs/dictionary-loader-$HEBMORPH_LUCENE_VERSION.jar ${RELEASE_PATH}/elasticsearch
 
 pushd ${RELEASE_PATH}
 zip -r "elasticsearch-analysis-hebrew-commercial-$1.zip" ./elasticsearch
