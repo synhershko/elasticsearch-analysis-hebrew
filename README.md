@@ -2,7 +2,7 @@
 
 Powered by HebMorph (https://github.com/synhershko/HebMorph) and licensed under the AGPL3
 
-![](https://travis-ci.org/synhershko/elasticsearch-analysis-hebrew.svg?branch=master) [ ![Download](https://api.bintray.com/packages/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-plugin/images/download.svg) ](https://bintray.com/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-plugin/_latestVersion)
+[![](https://travis-ci.org/synhershko/elasticsearch-analysis-hebrew.svg?branch=master)](https://travis-ci.org/synhershko/elasticsearch-analysis-hebrew) [ ![Download](https://api.bintray.com/packages/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-plugin/images/download.svg) ](https://bintray.com/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-plugin/_latestVersion)
 
 ## Installation
 
