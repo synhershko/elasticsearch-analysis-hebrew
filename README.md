@@ -36,6 +36,8 @@ Continue with installation? [y/N]y
 
 This is normal - please confirm by typing y and hitting Enter.
 
+Then be sure to restart the ElasticSearch service.
+
 ## Dictionaries
 
 This plugin uses dictionary files for it's operation. The open-source version is using hspell data files. In the 5.x versions, the dictionaries are bundled in the plugin download itself.
