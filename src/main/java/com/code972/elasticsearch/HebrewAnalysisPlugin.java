@@ -1,6 +1,13 @@
 package com.code972.elasticsearch;
 
-import com.code972.elasticsearch.plugins.index.analysis.*;
+import com.code972.elasticsearch.plugins.index.analysis.AddSuffixTokenFilterFactory;
+import com.code972.elasticsearch.plugins.index.analysis.HebrewExactAnalyzerProvider;
+import com.code972.elasticsearch.plugins.index.analysis.HebrewIndexingAnalyzerProvider;
+import com.code972.elasticsearch.plugins.index.analysis.HebrewLemmatizerTokenFilterFactory;
+import com.code972.elasticsearch.plugins.index.analysis.HebrewQueryAnalyzerProvider;
+import com.code972.elasticsearch.plugins.index.analysis.HebrewQueryLightAnalyzerProvider;
+import com.code972.elasticsearch.plugins.index.analysis.HebrewTokenizerFactory;
+import com.code972.elasticsearch.plugins.index.analysis.NiqqudFilterTokenFilterFactory;
 import com.code972.elasticsearch.plugins.rest.action.RestHebrewAnalyzerCheckWordAction;
 import com.code972.hebmorph.DictionaryLoader;
 import com.code972.hebmorph.datastructures.DictHebMorph;
@@ -26,10 +33,11 @@ import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestHandler;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
@@ -37,7 +45,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static java.util.Collections.*;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableMap;
+
 
 /**
  * The Hebrew analysis plugin entry point, locating and loading the dictionary and configuring
@@ -47,7 +58,7 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
 
     private final Logger log = LogManager.getLogger(this.getClass());
 
-    private final static String commercialDictionaryLoaderClass = "com.code972.hebmorph.dictionary.impl.HebMorphDictionaryLoader";
+    private final String commercialDictionaryLoaderClass = "com.code972.hebmorph.dictionary.impl.HebMorphDictionaryLoader";
 
     private static DictHebMorph dict;
     public static DictHebMorph getDictionary() {
@@ -58,7 +69,7 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
      * Attempts to load a dictionary from paths specified in elasticsearch.yml.
      * If hebrew.dict.path is defined, try loading that first.
      *
-     * @param settings
+     * @param settings settings
      */
     public HebrewAnalysisPlugin(final Settings settings) {
         super();
@@ -72,11 +83,11 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
         // Figure out which DictionaryLoader class to use for loading the dictionary
         DictionaryLoader dictLoader = (DictionaryLoader) AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
             try {
-                final Class clz;
+                final Class<?> clz;
                 if ((clz = Class.forName(commercialDictionaryLoaderClass)) != null) {
                     log.info("Dictionary loader available ({})", clz.getSimpleName());
                     try {
-                        Constructor ctor = Class.forName(commercialDictionaryLoaderClass).getConstructor();
+                        Constructor<?> ctor = Class.forName(commercialDictionaryLoaderClass).getConstructor();
                         return  (DictionaryLoader) ctor.newInstance();
                     } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
                         log.error("Unable to load the HebMorph dictionary", e);
@@ -125,15 +136,14 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
         private final String path;
         private final DictionaryLoader loader;
 
-        public LoadDictAction(final String path, DictionaryLoader dictLoader) {
+        LoadDictAction(final String path, DictionaryLoader dictLoader) {
             this.path = path;
             this.loader = dictLoader;
         }
 
         @Override
         public DictHebMorph run() {
-            final File file = new File(path);
-            if (file.exists()) {
+            if (Files.exists(Paths.get(path))) {
                 try {
                     return loader.loadDictionaryFromPath(path);
                 } catch (IOException e) {
@@ -145,14 +155,19 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
     }
 
     @Override
-    public List<RestHandler> getRestHandlers(Settings settings, RestController restController, ClusterSettings clusterSettings, IndexScopedSettings indexScopedSettings, SettingsFilter settingsFilter, IndexNameExpressionResolver indexNameExpressionResolver, Supplier<DiscoveryNodes> nodesInCluster) {
+    public List<RestHandler> getRestHandlers(Settings settings, RestController restController,
+                                             ClusterSettings clusterSettings, IndexScopedSettings indexScopedSettings,
+                                             SettingsFilter settingsFilter,
+                                             IndexNameExpressionResolver indexNameExpressionResolver,
+                                             Supplier<DiscoveryNodes> nodesInCluster) {
         return singletonList(new RestHebrewAnalyzerCheckWordAction(settings, restController));
     }
 
     @Override
     public Map<String, AnalysisModule.AnalysisProvider<TokenFilterFactory>> getTokenFilters() {
         final Map<String, AnalysisModule.AnalysisProvider<TokenFilterFactory>> extra = new HashMap<>();
-        extra.put("hebrew_lemmatizer", (indexSettings, env, name, settings) -> new HebrewLemmatizerTokenFilterFactory(indexSettings, env, name, settings, dict));
+        extra.put("hebrew_lemmatizer", (indexSettings, env, name, settings) ->
+                new HebrewLemmatizerTokenFilterFactory(indexSettings, env, name, settings, dict));
         extra.put("niqqud", NiqqudFilterTokenFilterFactory::new);
         extra.put("add_suffix", AddSuffixTokenFilterFactory::new);
         return unmodifiableMap(extra);
@@ -160,16 +175,22 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
 
     @Override
     public Map<String, AnalysisModule.AnalysisProvider<TokenizerFactory>> getTokenizers() {
-        return singletonMap("hebrew", (indexSettings, env, name, settings) -> new HebrewTokenizerFactory(indexSettings, env, name, settings, dict));
+        return singletonMap("hebrew", (indexSettings, env, name, settings) ->
+                new HebrewTokenizerFactory(indexSettings, env, name, settings, dict));
     }
 
     @Override
     public Map<String, AnalysisModule.AnalysisProvider<AnalyzerProvider<? extends Analyzer>>> getAnalyzers() {
-        final Map<String, AnalysisModule.AnalysisProvider<AnalyzerProvider<? extends Analyzer>>> extra = new HashMap<>();
-        extra.put("hebrew", (indexSettings, env, name, settings) -> new HebrewIndexingAnalyzerProvider(indexSettings, env, name, settings, dict));
-        extra.put("hebrew_query", (indexSettings, env, name, settings) -> new HebrewQueryAnalyzerProvider(indexSettings, env, name, settings, dict));
-        extra.put("hebrew_query_light", (indexSettings, env, name, settings) -> new HebrewQueryLightAnalyzerProvider(indexSettings, env, name, settings, dict));
-        extra.put("hebrew_exact", (indexSettings, env, name, settings) -> new HebrewExactAnalyzerProvider(indexSettings, env, name, settings, dict));
+        final Map<String, AnalysisModule.AnalysisProvider<AnalyzerProvider<? extends Analyzer>>> extra =
+                new HashMap<>();
+        extra.put("hebrew", (indexSettings, env, name, settings) ->
+                new HebrewIndexingAnalyzerProvider(indexSettings, env, name, settings, dict));
+        extra.put("hebrew_query", (indexSettings, env, name, settings) ->
+                new HebrewQueryAnalyzerProvider(indexSettings, env, name, settings, dict));
+        extra.put("hebrew_query_light", (indexSettings, env, name, settings) ->
+                new HebrewQueryLightAnalyzerProvider(indexSettings, env, name, settings, dict));
+        extra.put("hebrew_exact", (indexSettings, env, name, settings) ->
+                new HebrewExactAnalyzerProvider(indexSettings, env, name, settings, dict));
         return unmodifiableMap(extra);
     }
 }
