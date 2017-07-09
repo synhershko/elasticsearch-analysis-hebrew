@@ -4,3 +4,8 @@ releases/
 *.iml
 *.ipr
 *.bak
+.gradle
+gradle/
+build/
+gradlew
+gradlew.bat
