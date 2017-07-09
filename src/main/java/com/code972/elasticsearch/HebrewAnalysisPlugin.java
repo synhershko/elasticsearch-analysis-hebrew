@@ -128,8 +128,8 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
         // If path was specified in settings, try that path first
         final String pathFromSettings = settings.get("hebrew.dict.path");
         if (pathFromSettings != null && !pathFromSettings.isEmpty()) {
-            final DictHebMorph tmp = AccessController.doPrivileged(new LoadDictAction(pathFromSettings, dictLoader));
             log.info("Trying to load {} dictionary from path {}", dictLoader.dictionaryLoaderName(), pathFromSettings);
+            final DictHebMorph tmp = AccessController.doPrivileged(new LoadDictAction(pathFromSettings, dictLoader));
             if (tmp != null) {
                 dict = tmp;
                 log.info("Dictionary '{}' loaded successfully from path {}", dictLoader.dictionaryLoaderName(), pathFromSettings);
@@ -139,8 +139,8 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
 
         final Environment env = new Environment(settings);
         for (final String path : dictLoader.getPossiblePaths(env.pluginsFile().resolve("analysis-hebrew").toAbsolutePath().toString())) {
-            final DictHebMorph tmp = AccessController.doPrivileged(new LoadDictAction(path, dictLoader));
             log.info("Trying to load {} from path {}", dictLoader.dictionaryLoaderName(), path);
+            final DictHebMorph tmp = AccessController.doPrivileged(new LoadDictAction(path, dictLoader));
             if (tmp != null) {
                 dict = tmp;
                 log.info("Dictionary '{}' loaded successfully from path {}", dictLoader.dictionaryLoaderName(), path);
@@ -148,8 +148,7 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
             }
         }
 
-        throw new IllegalArgumentException("Could not load any dictionary. Aborting!");
-        // TODO log "tried paths"
+        log.error("Could not load any dictionary. Hebrew analysis plugin is essentially disabled.");
     }
 
     private class LoadDictAction implements PrivilegedAction<DictHebMorph> {
@@ -165,12 +164,16 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
         @Override
         @SuppressForbidden(reason = "Paths are loaded using Environment so are safe to use")
         public DictHebMorph run() {
-            if (Files.exists(Paths.get(path))) {
-                try {
-                    return loader.loadDictionaryFromPath(path);
-                } catch (IOException e) {
-                    log.error(e);
+            try {
+                if (Files.exists(Paths.get(path))) {
+                    try {
+                        return loader.loadDictionaryFromPath(path);
+                    } catch (IOException e) {
+                        log.warn(e);
+                    }
                 }
+            } catch (java.security.AccessControlException e) {
+                log.warn(e);
             }
             return null;
         }
