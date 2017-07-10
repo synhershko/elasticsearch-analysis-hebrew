@@ -5,10 +5,7 @@ releases/
 *.ipr
 *.bak
 .gradle
-gradle/
 build/
-gradlew
-gradlew.bat
 .local-*
 src/main/packaging/
 hspell-data-files/
