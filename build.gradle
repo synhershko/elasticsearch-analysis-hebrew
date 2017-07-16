@@ -1,3 +1,6 @@
+import de.undercouch.gradle.tasks.download.Download
+import com.github.mgk.gradle.*
+
 buildscript {
     repositories {
         mavenCentral()
@@ -10,24 +13,18 @@ buildscript {
 
 plugins {
     id "de.undercouch.download" version "3.2.0"
+    id "com.jfrog.bintray" version "1.7.3"
+    id "com.github.mgk.gradle.s3" version "1.4.0"
 }
 apply plugin: 'java'
 apply plugin: 'elasticsearch.esplugin'
 apply plugin: 'idea'
 
 def elasticsearchVersion = '5.5.0'
+def luceneVersion = '6.6.0'
 
 group = 'com.code972.hebmorph'
-version = '6.6.0'
 description = """elasticsearch-analysis-hebrew"""
-
-esplugin {
-    name 'analysis-hebrew'
-    version version // optional, this is an arbitrary version number for your plugin, and defaults to the version of elasticsearch
-    description 'Hebrew analyzer powered by HebMorph' // required, a short description of what the plugin does
-    classname 'com.code972.elasticsearch.HebrewAnalysisPlugin' // required, the full qualified class name that implements o.e.plugins.Plugin
-    licenseFile rootProject.file('LICENSE')
-}
 
 licenseHeaders {
     enabled = false
@@ -40,42 +37,105 @@ tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
 
-configurations.all {
-}
-
 repositories {
-     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-     maven { url "http://repo.maven.apache.org/maven2" }
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 dependencies {
-    compile group: 'com.code972.hebmorph', name: 'hebmorph-lucene', version: version
-    compileOnly group: 'org.apache.lucene', name: 'lucene-core', version: version
-    compileOnly group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: version
+    compile group: 'com.code972.hebmorph', name: 'hebmorph-lucene', version: luceneVersion
+    compileOnly group: 'org.apache.lucene', name: 'lucene-core', version: luceneVersion
+    compileOnly group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: luceneVersion
     compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.8.2'
     compileOnly group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearchVersion
     testCompile group: 'org.elasticsearch.test', name: 'framework', version: elasticsearchVersion
-    testCompile group: 'org.apache.lucene', name: 'lucene-test-framework', version: version
+    testCompile group: 'org.apache.lucene', name: 'lucene-test-framework', version: luceneVersion
     testCompile group: 'junit', name: 'junit', version:'4.12'
 }
 
-import de.undercouch.gradle.tasks.download.Download
 task getHspellDictionary(type: Download) {
     src([
-            'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz',
-            'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz.desc',
-            'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz.prefixes',
-            'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz.sizes',
-            'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz.stems',
-            'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/prefixes.c',
-            'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/dmask.c',
-            'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/prefix_h.gz'
+        'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz',
+        'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz.desc',
+        'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz.prefixes',
+        'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz.sizes',
+        'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/hebrew.wgz.stems',
+        'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/prefixes.c',
+        'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/dmask.c',
+        'https://github.com/synhershko/HebMorph/raw/master/hspell-data-files/prefix_h.gz'
     ])
     overwrite false
     dest 'hspell-data-files/'
 }
 
-allprojects {
-    task copyPackaging(type: Copy, dependsOn: getHspellDictionary) {
+task cleanPackaging(type:Delete) {
+    delete 'src/main/packaging', 'src/main/plugin-metadata'
+}
+
+// To execute packaging of the commercial version, run gradlew build -Pcommercial
+if (project.hasProperty('commercial')) {
+    version = elasticsearchVersion + '-commercial'
+
+    esplugin {
+        name 'analysis-hebrew'
+        version rootProject.version
+        description 'Hebrew analyzer powered by HebMorph (Commercial version)'
+        classname 'com.code972.elasticsearch.HebrewAnalysisPlugin'
+    }
+    dependencyLicenses.enabled = false
+    thirdPartyAudit.enabled = false
+
+    repositories {
+        maven {
+            url "s3://releases.dictionary-loader.hebmorph.code972.com.s3.eu-central-1.amazonaws.com"
+            credentials(AwsCredentials) {
+                accessKey "${System.getenv('AWS_ACCESS_KEY_ID')}"
+                secretKey "${System.getenv('AWS_SECRET_ACCESS_KEY')}"
+            }
+        }
+    }
+
+    dependencies {
+        compile group: 'com.code972.hebmorph', name: 'dictionary-loader', version: luceneVersion
+    }
+
+    task copyPackaging(type: Copy, dependsOn: cleanPackaging) {
+        from 'plugin-security-commercial.policy'
+        into 'src/main/plugin-metadata/'
+        rename ('plugin-security-commercial.policy', 'plugin-security.policy')
+    }
+
+    // Requires AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, or alternatively AWS_PROFILE, to be set
+    task getCommercialDictionary(type: S3Download, dependsOn: cleanPackaging) {
+        bucket = 'releases.dictionary.hebmorph.code972.com'
+        keyPrefix = "latest/"
+        destDir = "hebmorph-dictionary/"
+    }
+    task copyCommercialDictionary(type: Copy, dependsOn: getCommercialDictionary) {
+        from "hebmorph-dictionary/latest/"
+        into "src/main/packaging/"
+    }
+
+    bundlePlugin.dependsOn copyCommercialDictionary, copyPackaging
+
+    task release(type: S3Upload) {
+        bucket = 'releases.elasticsearch-analysis-hebrew.hebmorph.code972.com'
+        file = 'build/distributions/analysis-hebrew-'+ project.version +'.zip'
+        key = 'analysis-hebrew-'+ project.version +'.zip'
+        overwrite = true
+    }
+
+} else {
+    version = elasticsearchVersion
+
+    esplugin {
+        name 'analysis-hebrew'
+        version rootProject.version
+        description 'Hebrew analyzer powered by HebMorph'
+        classname 'com.code972.elasticsearch.HebrewAnalysisPlugin'
+        licenseFile rootProject.file('LICENSE')
+    }
+
+    task copyPackaging(type: Copy, dependsOn: [getHspellDictionary, cleanPackaging]) {
         into 'src/main/packaging'
         from 'plugin-security.policy'
         into('hspell-data-files') {
@@ -83,4 +143,35 @@ allprojects {
         }
     }
     bundlePlugin.dependsOn copyPackaging
+
+    bintray {
+        user    = 'synhershko'
+        key     = System.getenv('BINTRAY_KEY')
+        filesSpec {
+            from 'build/distributions/analysis-hebrew-'+ project.version +'.zip'
+            rename ('analysis-hebrew-'+ project.version +'.zip', 'elasticsearch-analysis-hebrew-'+ project.version +'.zip')
+            into '.'
+        }
+        publish = true
+        pkg {
+            repo = 'elasticsearch-analysis-hebrew'
+            name = 'elasticsearch-analysis-hebrew-plugin'
+            licenses = ['AGPL-V3']
+            publicDownloadNumbers = true
+
+            vcsUrl = 'https://github.com/synhershko/elasticsearch-analysis-hebrew.git'
+            githubRepo = 'synhershko/elasticsearch-analysis-hebrew'
+            githubReleaseNotesFile = 'README.md'
+            websiteUrl = 'http://code972.com/hebmorph'
+
+            version {
+                name = project.version
+                vcsTag = elasticsearchVersion
+            }
+        }
+    }
+
+    task release(dependsOn: bintrayUpload) {
+        // Placeholder task just to run the bintrayUpload task
+    }
 }

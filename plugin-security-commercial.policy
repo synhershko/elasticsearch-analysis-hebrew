@@ -1,0 +1,5 @@
+grant {
+    permission java.lang.RuntimePermission "accessClassInPackage.sun.reflect.generics.reflectiveObjects";
+
+    permission java.io.FilePermission "/var/lib/hebmorph/dictionary.dict", "read";
+};
