@@ -40,6 +40,7 @@ tasks.withType(JavaCompile) {
 repositories {
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    mavenLocal()
 }
 dependencies {
     compile group: 'com.code972.hebmorph', name: 'hebmorph-lucene', version: luceneVersion
@@ -92,6 +93,7 @@ if (project.hasProperty('commercial')) {
                 secretKey "${System.getenv('AWS_SECRET_ACCESS_KEY')}"
             }
         }
+        mavenLocal()
     }
 
     dependencies {
@@ -105,17 +107,21 @@ if (project.hasProperty('commercial')) {
     }
 
     // Requires AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, or alternatively AWS_PROFILE, to be set
-    task getCommercialDictionary(type: S3Download, dependsOn: cleanPackaging) {
+    task getCommercialDictionaryPointer(type: S3Download, dependsOn: cleanPackaging) {
         bucket = 'releases.dictionary.hebmorph.code972.com'
-        keyPrefix = "latest/"
-        destDir = "hebmorph-dictionary/"
+        key = 'latest'
+        file = 'src/main/packaging/dictionary.spec'
     }
-    task copyCommercialDictionary(type: Copy, dependsOn: getCommercialDictionary) {
-        from "hebmorph-dictionary/latest/"
-        into "src/main/packaging/"
+    task getCommercialDictionary(type: S3Download, dependsOn: getCommercialDictionaryPointer) {
+        doFirst {
+            def fn = new File('src/main/packaging/dictionary.spec').readLines().get(0)
+            key = fn
+        }
+        bucket = 'releases.dictionary.hebmorph.code972.com'
+        file = 'src/main/packaging/dictionary.dict'
     }
 
-    bundlePlugin.dependsOn copyCommercialDictionary, copyPackaging
+    bundlePlugin.dependsOn getCommercialDictionary, copyPackaging
 
     task release(type: S3Upload) {
         bucket = 'releases.elasticsearch-analysis-hebrew.hebmorph.code972.com'
