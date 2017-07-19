@@ -27,8 +27,8 @@ group = 'com.code972.hebmorph'
 description = """elasticsearch-analysis-hebrew"""
 
 licenseHeaders {
-    enabled = false
-    additionalLicense "AGPL3", "GNU Affero General Public License", "HebMorph's elasticsearch-analysis-hebrew"
+    additionalLicense 'AGPL3', 'GNU Affero General Public License', 'HebMorph\'s elasticsearch-analysis-hebrew'
+    approvedLicenses += ['GNU Affero General Public License']
 }
 
 sourceCompatibility = 1.8
