@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "org.elasticsearch.gradle:build-tools:5.5.0"
+        classpath "org.elasticsearch.gradle:build-tools:" + elasticsearchVersion 
     }
 }
 
@@ -20,8 +20,10 @@ apply plugin: 'java'
 apply plugin: 'elasticsearch.esplugin'
 apply plugin: 'idea'
 
-def elasticsearchVersion = '5.5.0'
-def luceneVersion = '6.6.0'
+// this is temporal and will be fixed in 6.0
+ext.projectSubstitutions = [:]
+licenseFile = rootProject.file('LICENSE')
+noticeFile = rootProject.file('NOTICE')
 
 group = 'com.code972.hebmorph'
 description = """elasticsearch-analysis-hebrew"""
@@ -38,8 +40,8 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
+    jcenter()
     mavenCentral()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     mavenLocal()
 }
 dependencies {
@@ -138,7 +140,6 @@ if (project.hasProperty('commercial')) {
         version rootProject.version
         description 'Hebrew analyzer powered by HebMorph'
         classname 'com.code972.elasticsearch.HebrewAnalysisPlugin'
-        licenseFile rootProject.file('LICENSE')
     }
 
     task copyPackaging(type: Copy, dependsOn: [getHspellDictionary, cleanPackaging]) {
