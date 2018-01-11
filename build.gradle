@@ -48,7 +48,7 @@ dependencies {
     compile group: 'com.code972.hebmorph', name: 'hebmorph-lucene', version: luceneVersion
     compileOnly group: 'org.apache.lucene', name: 'lucene-core', version: luceneVersion
     compileOnly group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: luceneVersion
-    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.8.2'
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.9.1'
     compileOnly group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearchVersion
     testCompile group: 'org.elasticsearch.test', name: 'framework', version: elasticsearchVersion
     testCompile group: 'org.apache.lucene', name: 'lucene-test-framework', version: luceneVersion
@@ -91,8 +91,8 @@ if (project.hasProperty('commercial')) {
         maven {
             url "s3://releases.dictionary-loader.hebmorph.code972.com.s3.eu-central-1.amazonaws.com"
             credentials(AwsCredentials) {
-                accessKey "${System.getenv('AWS_ACCESS_KEY_ID')}"
-                secretKey "${System.getenv('AWS_SECRET_ACCESS_KEY')}"
+                accessKey "${System.getenv('AWS_KEY')}"
+                secretKey "${System.getenv('AWS_SECRET')}"
             }
         }
         mavenLocal()
@@ -141,6 +141,7 @@ if (project.hasProperty('commercial')) {
         description 'Hebrew analyzer powered by HebMorph'
         classname 'com.code972.elasticsearch.HebrewAnalysisPlugin'
     }
+    thirdPartyAudit.enabled = false
 
     task copyPackaging(type: Copy, dependsOn: [getHspellDictionary, cleanPackaging]) {
         into 'src/main/packaging'
