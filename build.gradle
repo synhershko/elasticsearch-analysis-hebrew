@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "org.elasticsearch.gradle:build-tools:" + elasticsearchVersion 
+        classpath "org.elasticsearch.gradle:build-tools:" + elasticsearch
     }
 }
 
@@ -45,14 +45,14 @@ repositories {
     mavenLocal()
 }
 dependencies {
-    compile group: 'com.code972.hebmorph', name: 'hebmorph-lucene', version: luceneVersion
-    compileOnly group: 'org.apache.lucene', name: 'lucene-core', version: luceneVersion
-    compileOnly group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: luceneVersion
-    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.9.1'
-    compileOnly group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearchVersion
-    testCompile group: 'org.elasticsearch.test', name: 'framework', version: elasticsearchVersion
-    testCompile group: 'org.apache.lucene', name: 'lucene-test-framework', version: luceneVersion
-    testCompile group: 'junit', name: 'junit', version:'4.12'
+    compile group: 'com.code972.hebmorph', name: 'hebmorph-lucene', version: lucene
+    compileOnly group: 'org.apache.lucene', name: 'lucene-core', version: lucene
+    compileOnly group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: lucene
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4j
+    compileOnly group: 'org.elasticsearch', name: 'elasticsearch', version: elasticsearch
+    testCompile group: 'org.elasticsearch.test', name: 'framework', version: elasticsearch
+    testCompile group: 'org.apache.lucene', name: 'lucene-test-framework', version: lucene
+    testCompile group: 'junit', name: 'junit', version: junit
 }
 
 task getHspellDictionary(type: Download) {
@@ -76,7 +76,7 @@ task cleanPackaging(type:Delete) {
 
 // To execute packaging of the commercial version, run gradlew build -Pcommercial
 if (project.hasProperty('commercial')) {
-    version = elasticsearchVersion + '-commercial'
+    version = elasticsearch + '-commercial'
 
     esplugin {
         name 'analysis-hebrew'
@@ -99,7 +99,7 @@ if (project.hasProperty('commercial')) {
     }
 
     dependencies {
-        compile group: 'com.code972.hebmorph', name: 'dictionary-loader', version: luceneVersion
+        compile group: 'com.code972.hebmorph', name: 'dictionary-loader', version: lucene
     }
 
     task copyPackaging(type: Copy, dependsOn: cleanPackaging) {
@@ -130,10 +130,11 @@ if (project.hasProperty('commercial')) {
         file = 'build/distributions/analysis-hebrew-'+ project.version +'.zip'
         key = 'analysis-hebrew-'+ project.version +'.zip'
         overwrite = true
+        // TODO: make public
     }
 
 } else {
-    version = elasticsearchVersion
+    version = elasticsearch
 
     esplugin {
         name 'analysis-hebrew'
@@ -174,7 +175,7 @@ if (project.hasProperty('commercial')) {
 
             version {
                 name = project.version
-                vcsTag = elasticsearchVersion
+                vcsTag = elasticsearch
             }
         }
     }
