@@ -3,11 +3,10 @@ import com.github.mgk.gradle.*
 
 buildscript {
     repositories {
-        mavenCentral()
         jcenter()
     }
     dependencies {
-        classpath "org.elasticsearch.gradle:build-tools:" + elasticsearch
+        classpath 'io.plugind.builders.elasticsearch:gradle-plugin:0.3.0'
     }
 }
 
