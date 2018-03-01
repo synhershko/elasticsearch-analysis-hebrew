@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -95,7 +96,7 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
      *
      * @param settings settings
      */
-    public HebrewAnalysisPlugin(final Settings settings) {
+    public HebrewAnalysisPlugin(final Settings settings, final Path configPath) {
         super();
 
         final SecurityManager sm = System.getSecurityManager();
@@ -140,7 +141,7 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
             }
         }
 
-        final Environment env = new Environment(settings);
+        final Environment env = new Environment(settings, configPath);
         for (final String path : dictLoader.getPossiblePaths(env.pluginsFile().resolve("analysis-hebrew").toAbsolutePath().toString())) {
             log.info("Trying to load {} from path {}", dictLoader.dictionaryLoaderName(), path);
             final DictHebMorph tmp = AccessController.doPrivileged(new LoadDictAction(path, dictLoader));
