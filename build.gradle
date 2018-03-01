@@ -39,9 +39,8 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
-    jcenter()
-    mavenCentral()
     mavenLocal()
+    jcenter()
 }
 dependencies {
     compile group: 'com.code972.hebmorph', name: 'hebmorph-lucene', version: lucene

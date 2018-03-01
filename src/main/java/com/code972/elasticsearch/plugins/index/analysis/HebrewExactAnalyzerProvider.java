@@ -34,7 +34,7 @@ public class HebrewExactAnalyzerProvider extends AbstractIndexAnalyzerProvider<H
 
     @Inject
     public HebrewExactAnalyzerProvider(IndexSettings indexSettings, Environment env, String name, Settings settings,
-                                       final DictHebMorph dict) throws IOException {
+                                       final DictHebMorph dict) {
         super(indexSettings, name, settings);
         analyzer = new HebrewExactAnalyzer(dict);
         analyzer.setVersion(this.version);

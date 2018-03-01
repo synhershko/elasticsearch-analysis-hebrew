@@ -23,10 +23,13 @@ package com.code972.elasticsearch;
 import com.code972.elasticsearch.plugins.index.analysis.AddSuffixTokenFilterFactory;
 import com.code972.elasticsearch.plugins.index.analysis.HebrewExactAnalyzerProvider;
 import com.code972.elasticsearch.plugins.index.analysis.HebrewIndexingAnalyzerProvider;
+import com.code972.elasticsearch.plugins.index.analysis.HebrewLegacyIndexingAnalyzerProvider;
+import com.code972.elasticsearch.plugins.index.analysis.HebrewLegacyQueryAnalyzerProvider;
 import com.code972.elasticsearch.plugins.index.analysis.HebrewLemmatizerTokenFilterFactory;
 import com.code972.elasticsearch.plugins.index.analysis.HebrewQueryAnalyzerProvider;
 import com.code972.elasticsearch.plugins.index.analysis.HebrewQueryLightAnalyzerProvider;
 import com.code972.elasticsearch.plugins.index.analysis.HebrewTokenizerFactory;
+import com.code972.elasticsearch.plugins.index.analysis.MarkHebrewTokensFilterFactory;
 import com.code972.elasticsearch.plugins.index.analysis.NiqqudFilterTokenFilterFactory;
 import com.code972.elasticsearch.plugins.rest.action.RestHebrewAnalyzerCheckWordAction;
 import com.code972.hebmorph.DictionaryLoader;
@@ -195,6 +198,7 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
                 new HebrewLemmatizerTokenFilterFactory(indexSettings, env, name, settings, dict));
         extra.put("niqqud", NiqqudFilterTokenFilterFactory::new);
         extra.put("add_suffix", AddSuffixTokenFilterFactory::new);
+        extra.put("mark_hebrew_tokens", MarkHebrewTokensFilterFactory::new);
         return unmodifiableMap(extra);
     }
 
@@ -210,8 +214,12 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
                 new HashMap<>();
         extra.put("hebrew", (indexSettings, env, name, settings) ->
                 new HebrewIndexingAnalyzerProvider(indexSettings, env, name, settings, dict));
+        extra.put("hebrew_legacy", (indexSettings, env, name, settings) ->
+                new HebrewLegacyIndexingAnalyzerProvider(indexSettings, env, name, settings, dict));
         extra.put("hebrew_query", (indexSettings, env, name, settings) ->
                 new HebrewQueryAnalyzerProvider(indexSettings, env, name, settings, dict));
+        extra.put("hebrew_query_legacy", (indexSettings, env, name, settings) ->
+                new HebrewLegacyQueryAnalyzerProvider(indexSettings, env, name, settings, dict));
         extra.put("hebrew_query_light", (indexSettings, env, name, settings) ->
                 new HebrewQueryLightAnalyzerProvider(indexSettings, env, name, settings, dict));
         extra.put("hebrew_exact", (indexSettings, env, name, settings) ->

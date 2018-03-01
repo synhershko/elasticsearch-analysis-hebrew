@@ -54,6 +54,11 @@ public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     }
 
     @Override
+    public String getName() {
+        return "hebrew_analyzer_check_word";
+    }
+
+    @Override
     protected RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient nodeClient) throws IOException {
         final String word = request.param("word");
         final boolean tolerate = request.paramAsBoolean("tolerate", true);

@@ -34,7 +34,7 @@ public class HebrewQueryAnalyzerProvider extends AbstractIndexAnalyzerProvider<H
 
     @Inject
     public HebrewQueryAnalyzerProvider(IndexSettings indexSettings, Environment env, String name, Settings settings,
-                                       final DictHebMorph dict) throws IOException {
+                                       final DictHebMorph dict) {
         super(indexSettings, name, settings);
         hebrewAnalyzer = new HebrewQueryAnalyzer(dict);
         hebrewAnalyzer.setVersion(this.version);

@@ -40,7 +40,7 @@ public class HebrewTokenizerFactory extends AbstractTokenizerFactory {
 
     private DictHebMorph dict;
     private DictRadix<Byte> SPECIAL_TOKENIZATION_CASES = null;
-    private final char originalTermSuffix = '$';
+    private static final char originalTermSuffix = '$';
 
     @Override
     public Tokenizer create() {
