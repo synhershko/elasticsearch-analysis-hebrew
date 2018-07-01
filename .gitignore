@@ -2,13 +2,8 @@ plugin-metadata/
 target/
 releases/
 .idea/
-*.iml
-*.ipr
-*.bak
-.gradle
 build/
-.local-*
-src/main/packaging/
+.gradle/
 hspell-data-files/
-.DS_Store
-elasticsearch/
+gradle.properties
+*.iml
