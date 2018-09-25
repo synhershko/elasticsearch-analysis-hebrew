@@ -7,13 +7,13 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'io.plugind.builders.elasticsearch:gradle-plugin:0.3.0'
+        classpath "org.elasticsearch.gradle:build-tools:6.4.1"
     }
 }
 
 plugins {
     id "de.undercouch.download" version "3.2.0"
-    id "com.jfrog.bintray" version "1.7.3"
+    id "com.jfrog.bintray" version "1.8.4"
     id "com.github.mgk.gradle.s3" version "1.4.0"
 }
 apply plugin: 'idea'
