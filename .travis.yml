@@ -7,5 +7,5 @@ cache:
   - $HOME/.gradle
 
 script:
-  - ./setup.sh 5.6.5
+  - ./setup.sh 6.4.1
   - ./gradlew clean updateSHAs check
