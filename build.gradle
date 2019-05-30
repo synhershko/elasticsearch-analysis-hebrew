@@ -3,11 +3,11 @@ import com.github.mgk.gradle.*
 
 buildscript {
     repositories {
-        jcenter()
         mavenLocal()
+        jcenter()
     }
     dependencies {
-        classpath "org.elasticsearch.gradle:build-tools:6.4.1"
+        classpath "org.elasticsearch.gradle:build-tools:7.1.0"
     }
 }
 
@@ -83,6 +83,7 @@ if (project.hasProperty('commercial')) {
     thirdPartyAudit.enabled = false
 
     repositories {
+        mavenLocal()
         maven {
             url "s3://releases.dictionary-loader.hebmorph.code972.com.s3.eu-central-1.amazonaws.com"
             credentials(AwsCredentials) {
@@ -90,7 +91,6 @@ if (project.hasProperty('commercial')) {
                 secretKey "${System.getenv('AWS_SECRET_ACCESS_KEY')}"
             }
         }
-        mavenLocal()
     }
 
     dependencies {
