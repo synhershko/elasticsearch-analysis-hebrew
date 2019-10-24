@@ -187,7 +187,7 @@ public final class HebrewAnalysisPlugin extends Plugin implements ActionPlugin, 
                                              SettingsFilter settingsFilter,
                                              IndexNameExpressionResolver indexNameExpressionResolver,
                                              Supplier<DiscoveryNodes> nodesInCluster) {
-        return singletonList(new RestHebrewAnalyzerCheckWordAction(settings, restController));
+        return singletonList(new RestHebrewAnalyzerCheckWordAction(restController));
     }
 
     @Override

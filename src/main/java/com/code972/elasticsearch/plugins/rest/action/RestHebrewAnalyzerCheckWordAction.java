@@ -29,7 +29,6 @@ import org.apache.lucene.analysis.hebrew.HebrewQueryLightAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.common.inject.Inject;
-import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.BytesRestResponse;
@@ -48,8 +47,8 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
  */
 public class RestHebrewAnalyzerCheckWordAction extends BaseRestHandler {
     @Inject
-    public RestHebrewAnalyzerCheckWordAction(Settings settings, RestController controller) {
-        super(settings);
+    public RestHebrewAnalyzerCheckWordAction(RestController controller) {
+        super();
         controller.registerHandler(GET, "/_hebrew/check-word/{word}", this);
     }
 

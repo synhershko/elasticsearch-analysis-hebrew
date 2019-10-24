@@ -34,7 +34,7 @@ public class HebrewTokenizerFactory extends AbstractTokenizerFactory {
     @Inject
     public HebrewTokenizerFactory(IndexSettings indexSettings, Environment env, String name, Settings settings,
                                   final DictHebMorph dict) {
-        super(indexSettings, settings);
+        super(indexSettings, settings, name);
         this.dict = dict;
     }
 

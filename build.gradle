@@ -2,12 +2,15 @@ import de.undercouch.gradle.tasks.download.Download
 import com.github.mgk.gradle.*
 
 buildscript {
+    ext {
+        elasticsearchVersion = System.getProperty("es.version", "7.4.0")
+    }
     repositories {
         mavenLocal()
         jcenter()
     }
     dependencies {
-        classpath "org.elasticsearch.gradle:build-tools:7.1.0"
+        classpath "org.elasticsearch.gradle:build-tools:${elasticsearchVersion}"
     }
 }
 
@@ -20,8 +23,11 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'elasticsearch.esplugin'
 
-licenseFile = rootProject.file('LICENSE')
-noticeFile = rootProject.file('NOTICE')
+ext {
+    licenseFile = rootProject.file('LICENSE')
+    noticeFile = rootProject.file('NOTICE')
+}
+
 
 group = 'com.code972.hebmorph'
 description = """elasticsearch-analysis-hebrew"""
